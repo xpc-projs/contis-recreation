@@ -1,0 +1,135 @@
+{
+  "Bataan": {
+    "count": 1,
+    "cities": {
+      "Balanga": 1
+    }
+  },
+  "Batangas": {
+    "count": 5,
+    "cities": {
+      "Batangas": 2,
+      "Lipa": 2,
+      "Santo Tomas": 1
+    }
+  },
+  "Benguet": {
+    "count": 1,
+    "cities": {
+      "Baguio": 1
+    }
+  },
+  "Bulacan": {
+    "count": 7,
+    "cities": {
+      "Baliuag": 1,
+      "Malolos": 2,
+      "Marilao": 1,
+      "Pulilan": 1,
+      "San Jose del Monte": 1,
+      "Sta. Maria": 1
+    }
+  },
+  "Cavite": {
+    "count": 8,
+    "cities": {
+      "Bacoor": 2,
+      "Dasmariñas": 1,
+      "General Trias": 1,
+      "Imus": 1,
+      "Kawit": 1,
+      "Tagaytay": 1,
+      "Trece Martires": 1
+    }
+  },
+  "Cebu": {
+    "count": 4,
+    "cities": {
+      "Cebu": 4
+    }
+  },
+  "Laguna": {
+    "count": 7,
+    "cities": {
+      "Biñan": 1,
+      "Calamba": 2,
+      "San Pablo": 2,
+      "San Pedro": 1,
+      "Santa Rosa": 1
+    }
+  },
+  "La Union": {
+    "count": 1,
+    "cities": {
+      "San Fernando": 1
+    }
+  },
+  "Metro Manila": {
+    "count": 50,
+    "cities": {
+      "Caloocan": 2,
+      "Las Piñas": 2,
+      "Makati": 3,
+      "Malabon": 1,
+      "Mandaluyong": 2,
+      "Manila": 6,
+      "Marikina": 1,
+      "Muntinlupa": 2,
+      "Parañaque": 4,
+      "Pasay": 2,
+      "Pasig": 3,
+      "Quezon City": 15,
+      "Taguig": 6,
+      "Valenzuela": 1
+    }
+  },
+  "Nueva Ecija": {
+    "count": 2,
+    "cities": {
+      "Cabanatuan": 1,
+      "Gapan": 1
+    }
+  },
+  "Pampanga": {
+    "count": 4,
+    "cities": {
+      "Angeles": 1,
+      "San Fernando": 3
+    }
+  },
+  "Pangasinan": {
+    "count": 2,
+    "cities": {
+      "Dagupan": 1,
+      "Urdaneta City": 1
+    }
+  },
+  "Quezon Province": {
+    "count": 1,
+    "cities": {
+      "Lucena": 1
+    }
+  },
+  "Rizal": {
+    "count": 7,
+    "cities": {
+      "Angono": 1,
+      "Antipolo": 2,
+      "Montalban": 1,
+      "San Mateo": 1,
+      "Taytay": 2
+    }
+  },
+  "Tarlac": {
+    "count": 1,
+    "cities": {
+      "Tarlac": 1
+    }
+  },
+  "Zambales": {
+    "count": 1,
+    "cities": {
+      "Olongapo": 1
+    }
+  }
+}

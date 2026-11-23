@@ -1,0 +1,58 @@
+[
+  {
+    "title": "All Products",
+    "slug": "all",
+    "path": "/collections/all/",
+    "category": null,
+    "menuItem": false
+  },
+  {
+    "title": "What's New",
+    "slug": "latest-products",
+    "path": "/collections/latest-products/",
+    "category": "What's New",
+    "source": "https://www.contis.ph/collections/latest-products",
+    "menuItem": true
+  },
+  {
+    "title": "Restaurant Menu",
+    "slug": "restaurant-menu",
+    "path": "/collections/restaurant-menu/",
+    "category": "Restaurant Menu",
+    "source": "https://www.contis.ph/collections/restaurant-menu",
+    "menuItem": true
+  },
+  {
+    "title": "Food Trays",
+    "slug": "large-food-order",
+    "path": "/collections/large-food-order/",
+    "category": "Food Trays",
+    "source": "https://www.contis.ph/collections/large-food-order",
+    "menuItem": true
+  },
+  {
+    "title": "Fabulous Cakes",
+    "slug": "fabulous-cakes",
+    "path": "/collections/fabulous-cakes/",
+    "category": "Fabulous Cakes",
+    "source": "https://www.contis.ph/collections/fabulous-cakes",
+    "menuItem": true
+  },
+  {
+    "title": "Baked Goodies",
+    "slug": "take-out-nook",
+    "path": "/collections/take-out-nook/",
+    "category": "Baked Goodies",
+    "source": "https://www.contis.ph/collections/take-out-nook",
+    "menuItem": true
+  },
+  {
+    "title": "Cake Accessories",
+    "slug": "cake-accessories",
+    "path": "/collections/cake-accessories/",
+    "category": "Baked Goodies",
+    "subcategory": "Cake Accessories",
+    "source": "https://www.contis.ph/collections/take-out-nook",
+    "menuItem": false
+  }
+]

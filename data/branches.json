@@ -1,0 +1,716 @@
+[
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Bataan",
+        "city":  "Balanga",
+        "region":  "Bataan",
+        "address":  "Ground floor, Balanga, 2100",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-express-lane-sm-bataan"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Diversion Rd, Batangas",
+        "city":  "Batangas",
+        "region":  "Batangas",
+        "address":  "Diversion Road Balagtas, Batangas, 4200",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-diversion-rd-batangas"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Batangas Port",
+        "city":  "Batangas",
+        "region":  "Batangas",
+        "address":  "Shop 6 and 7 Batangas Passenger Terminal, Batangas, 4200",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-batangas-port"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Robinsons Place Lipa",
+        "city":  "Lipa",
+        "region":  "Batangas",
+        "address":  "Level 1, Main Mall, Robinsons Place Lipa President Jose P. Laurel Highway, Lipa, 4217",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-express-lane-robinsons-place-lipa"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Lipa",
+        "city":  "Lipa",
+        "region":  "Batangas",
+        "address":  "(In front of SM City Lipa) Ayala Hiway Brgy. Sabang, Lipa, 4217",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-lipa"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant with Drive Thru - Sto Tomas Batangas",
+        "city":  "Santo Tomas",
+        "region":  "Batangas",
+        "address":  "The Gateway Drive, Santo Tomas, 4234",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-with-dt-sto-tomas-batangas"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Baguio",
+        "city":  "Baguio",
+        "region":  "Benguet",
+        "address":  "RS-IR-201 SM Baguio , Baguio, 2600",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-baguio"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Baliuag",
+        "city":  "Baliuag",
+        "region":  "Bulacan",
+        "address":  "DRT Highway, Brgy. Pagala, Baliuag, Baliuag, 1630",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-baliuag"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Tikay Malolos",
+        "city":  "Malolos",
+        "region":  "Bulacan",
+        "address":  "Pinagbakan Street Tikay, Malolos, 3000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-tikay"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Robinsons Place Malolos",
+        "city":  "Malolos",
+        "region":  "Bulacan",
+        "address":  "Level 1, Robinsons Place Malolos McArthur Highway Sumapang Matanda, Malolos, 3000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-robinsons-place-malolos"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Marilao",
+        "city":  "Marilao",
+        "region":  "Bulacan",
+        "address":  "MacArthur Highway, Ibayo, SM City Marilao, Marilao, 3019",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-marilao"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Center Pulilan",
+        "city":  "Pulilan",
+        "region":  "Bulacan",
+        "address":  "Ground Floor, SM Center Pulilan, Pulilan Diversion Road, Brgy. Sto. Cristo Pulilan, Pulilan, 3005",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-center-pulilan"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM City San Jose Del Monte",
+        "city":  "San Jose Del Monte",
+        "region":  "Bulacan",
+        "address":  "Upper Ground Floor, SM City San Jose del Monte, Quirino St, Novaliches, San Jose Del Monte, 3023",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-city-san-jose-del-monte"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Sta. Maria Bulacan",
+        "city":  "Sta. Maria",
+        "region":  "Bulacan",
+        "address":  "818 Sta. Maria Bypass Road, Sta Maria, 3023",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sta-maria-bulacan"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant with Drive Thru - Molino",
+        "city":  "Bacoor",
+        "region":  "Cavite",
+        "address":  "Molino Blvd, Masaito Dr, Bacoor, Cavite, Bacoor, 4102",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-with-dt-molino"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Bacoor",
+        "city":  "Bacoor",
+        "region":  "Cavite",
+        "address":  "Upper Ground Floor, SM Bacoor, Bacoor, 4102",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-bacoor"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Dasmariñas",
+        "city":  "Dasmariñas",
+        "region":  "Cavite",
+        "address":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Dasmariñas , Dasmariñas , 4114",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-dasmari-as"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Robinsons General Trias",
+        "city":  "General Trias",
+        "region":  "Cavite",
+        "address":  "Robinsons Place Gen Trias, General Trias, 4107",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-rob-general-trias"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook with Drive Thru - Anabu Imus",
+        "city":  "Imus",
+        "region":  "Cavite",
+        "address":  "Emilio Aguinaldo Hwy, Imus, Cavite, Imus, 4103",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-standalone-ton-w-drive-thru-anabu"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant with Drive Thru - Kawit Cavite",
+        "city":  "Kawit",
+        "region":  "Cavite",
+        "address":  "Antero Soriano Highway, Kawit, 4104",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-with-drive-thru-kawit-cavite"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Lake Hotel Tagaytay",
+        "city":  "Tagaytay",
+        "region":  "Cavite",
+        "address":  "Km.58 Gen. Brgy Emilio Aguinaldo Hwy, Tagaytay, 4120 Cavite, Tagaytay, 4120",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-lake-hotel-tagaytay"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Trece Martires",
+        "city":  "Trece Martires",
+        "region":  "Cavite",
+        "address":  "SM Trece Martires Unit LG042, Lower ground, SM City Trece Martires, Governor\u0027s Drive, Trece Martires, 4109",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-express-lane-sm-trece-martires"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM City Cebu",
+        "city":  "Cebu",
+        "region":  "Cebu",
+        "address":  "Upper G/F Northwing Hallway 100 SM City Cebu, Cebu, 6000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-city-cebu"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Seaside Cebu",
+        "city":  "Cebu",
+        "region":  "Cebu",
+        "address":  "South Road Properties, Cebu, 6000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-seaside-cebu"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Ayala Center Cebu",
+        "city":  "Cebu",
+        "region":  "Cebu",
+        "address":  "L1 Ayala Center Cebu, Cebu, 6000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-ayala-center-cebu"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Ayala Malls Central Bloc Cebu",
+        "city":  "Cebu",
+        "region":  "Cebu",
+        "address":  "I. Villa St., Cebu, 6000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-ayala-malls-central-bloc"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Southwoods Mall",
+        "city":  "Biñan",
+        "region":  "Laguna",
+        "address":  "Ground Floor, Southwoods Mall, Southwoods Ave, Biñan, 4024",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-southwoods-mall"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Creekside Calamba",
+        "city":  "Calamba",
+        "region":  "Laguna",
+        "address":  "218 Manila S Rd, Serenitea Creekside Calamba, Calamba, 4029",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-maharlika-calamba"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Milagrosa",
+        "city":  "Calamba",
+        "region":  "Laguna",
+        "address":  "Km 53 Maharlika Highway, Calamba, 4027",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-milagrosa"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM San Pablo",
+        "city":  "San Pablo",
+        "region":  "Laguna",
+        "address":  "Conti\u0027s Take Out Nook - SM San Pablo, San Pablo, 4000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-san-pablo"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop and Restaurant - San Pablo Mainstreet",
+        "city":  "San Pablo",
+        "region":  "Laguna",
+        "address":  "Mainstreet Plaza, San Pablo, 4000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-san-pablo-mainstreet"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Robinsons Galleria South",
+        "city":  "San Pedro",
+        "region":  "Laguna",
+        "address":  "Level 1, Robinsons Galleria South, National Road, San Pedro, 4023",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-robinsons-galleria-south"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM City Santa Rosa Laguna",
+        "city":  "Santa Rosa",
+        "region":  "Laguna",
+        "address":  "Ground Level, SM City Santa Rosa, Old National Highway, Santa Rosa, 4026",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-sta-rosa-laguna"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop and Restaurant - SM La Union",
+        "city":  "San Fernando",
+        "region":  "La Union",
+        "address":  "237 San Fernando By-Pass Rd, Barangay Biday, San Fernando, 2500",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-sm-la-union"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Grand Central",
+        "city":  "Caloocan",
+        "region":  "Metro Manila",
+        "address":  "Rizal Avenue Extension, Barangay 88, Zone 8, District II, Grace Park East, Caloocan, 1403",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-grand-central"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Caloocan",
+        "city":  "Caloocan",
+        "region":  "Metro Manila",
+        "address":  "Ground Floor, SM Caloocan, Deparo Road, Caloocan, 1421",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-caloocan"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Southmall",
+        "city":  "Las Piñas",
+        "region":  "Metro Manila",
+        "address":  "Food Street, Ground Floor, SM Southmall, Alabang Zapote Road, Almanza Uno, Las Piñas , 1750",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-south-mall"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Evia Mall",
+        "city":  "Las Piñas",
+        "region":  "Metro Manila",
+        "address":  "Daang Hari Road, Kalakhang Maynila, Las Piñas , 1750",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-evia-take-out-nook"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Cash and Carry",
+        "city":  "Makati",
+        "region":  "Metro Manila",
+        "address":  "Ground Level, Cash and Carry Mall, Makati, 1235",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-express-cash-and-carry"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Century City Makati",
+        "city":  "Makati",
+        "region":  "Metro Manila",
+        "address":  "Level 1 Century City Mall, Brgy. Poblacion, Makati, 1210",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-century-city-makati"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook Cafe - One Ayala Mall",
+        "city":  "Makati",
+        "region":  "Metro Manila",
+        "address":  "L2, One Ayala Mall, Makati, 1226",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-cafe-one-ayala-mall"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Fisher Mall Malabon",
+        "city":  "Malabon",
+        "region":  "Metro Manila",
+        "address":  "Ground Floor, Fisher Mall Malabon, Longos, Malabon, 1470",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-fisher-mall-malabon"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Shaw",
+        "city":  "Mandaluyong",
+        "region":  "Metro Manila",
+        "address":  "515 Laurel Mansion Shaw Boulevard, Mandaluyong, 1556",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-shaw"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Megamall",
+        "city":  "Mandaluyong",
+        "region":  "Metro Manila",
+        "address":  "135 B, Building A SM Megamall EDSA Corner, Doña Julia Vargas Ave, Ortigas Center, Mandaluyong, 1550",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-sm-megamall-a"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM City Manila",
+        "city":  "Manila",
+        "region":  "Metro Manila",
+        "address":  "Lower Ground Level, SM City Manila, Ermita, Manila, 2018 Metro Manila, Manila, 2018",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-city-manila"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Robinsons Place Manila",
+        "city":  "Manila",
+        "region":  "Metro Manila",
+        "address":  "Level 1, Pedro Gil Wing, Manila, 1000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-robinsons-place-manila"
+    },
+    {
+        "name":  "Conti\u0027s Bakery \u0026 Café - Robinsons Place Manila",
+        "city":  "Manila",
+        "region":  "Metro Manila",
+        "address":  "Robinsons Place Manila, Pedro Gil St., Ermita, Manila, 1016",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakery-caf-robinsons-place"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM San Lazaro",
+        "city":  "Manila",
+        "region":  "Metro Manila",
+        "address":  "cor, Felix Huertas, Lacson Ave, Santa Cruz, Manila, 1003",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-san-lazaro"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Lucky Chinatown",
+        "city":  "Manila",
+        "region":  "Metro Manila",
+        "address":  "Lucky Chinatown Mall, Lachambre St, Binondo, Manila, 1006",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-lucky-china-town"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - UN Manila",
+        "city":  "Manila",
+        "region":  "Metro Manila",
+        "address":  "United Nation Ave, corner Maria Orosa St, Ermita, Manila, 1000 Metro Manila, Manila, 1000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-un-manila"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Ayala Malls Marikina",
+        "city":  "Marikina",
+        "region":  "Metro Manila",
+        "address":  "Ayala Malls Marikina, Liwasang Kalayaan, Marikina, 1810",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-ton-standalone-ayala-malls-marikina"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Westgate Alabang",
+        "city":  "Muntinlupa",
+        "region":  "Metro Manila",
+        "address":  "Lot X-101, Westgate Center, Filinvest Alabang, Muntinlupa, 1781",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-westgate-alabang"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Festival Mall Alabang",
+        "city":  "Muntinlupa",
+        "region":  "Metro Manila",
+        "address":  "Conti\u0027s Take Out Nook - Festival Mall Alabang, Muntinlupa, 1781",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-festival-mall-alabang"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Sucat Parañaque",
+        "city":  "Parañaque",
+        "region":  "Metro Manila",
+        "address":  "107 Lower Ground Floor SM Sucat Bldg A Dr A Santos Ave Brgy San Dionisio, Parañaque, 1700",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-sucat-paranaque"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Bicutan",
+        "city":  "Parañaque",
+        "region":  "Metro Manila",
+        "address":  "Upper Ground Floor, Building A, SM City Bicutan, Parañaque, 1711",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-bicutan"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Ayala Malls Manila Bay",
+        "city":  "Parañaque",
+        "region":  "Metro Manila",
+        "address":  "GF Main Building, Diosdado Macapagal Boulevard corner Asean Avenue, Parañaque, 1701",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-ayala-malls-manila-bay"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - BF Homes",
+        "city":  "Parañaque",
+        "region":  "Metro Manila",
+        "address":  "61 President\u0027s Ave, Barangay BF Homes, Parañaque, 1718",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-bf-homes"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Mall of Asia",
+        "city":  "Pasay",
+        "region":  "Metro Manila",
+        "address":  "North Parking, SM Mall of Asia, North Wing, J.W. Diokno Blvd., Pasay, 1300",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-sm-mall-of-asia"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Blue Bay Walk",
+        "city":  "Pasay",
+        "region":  "Metro Manila",
+        "address":  "Unit L-102 Blue Bay Walk, EDSA Corner Macapagal Blvd., Metro Park Bay Area, CBD, Pasay, 1709",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-blue-bay-walk"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Ayala Mall Feliz",
+        "city":  "Pasig",
+        "region":  "Metro Manila",
+        "address":  "Level 1 Ayala Malls Feliz, Marco Highway, Pasig, 1610",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-ayala-mall-feliz"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Unimart Capitol Commons",
+        "city":  "Pasig",
+        "region":  "Metro Manila",
+        "address":  "Ground Floor, Level, Capitol Commons, Camino Verde Road, Pasig, 1600",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-unimart-capitol-commons"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM East Ortigas",
+        "city":  "Pasig",
+        "region":  "Metro Manila",
+        "address":  "Ground Level, Main Mall , SM City East Ortigas, Ortigas Avenue Ext., Brgy. Sta. Lucia, Pasig, 1608",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-east-ortigas"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Ayala Mall Cloverleaf",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Space CK1-3 Ground Floor, Ayala Malls Cloverleaf, Bonifacio Ave. Balingasa , Quezon City, 1115",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-ayala-mall-cloverleaf"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Gateway Cubao",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Gateway Mall 2, Level 2, General Malvar Ave, Cubao, Quezon City, Metro Manila, Quezon City, 1109",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-gateway-cubao"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Fairview",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Lower Ground Level, Central Walk, SM Fairview, 2 Quirino Hwy, Novaliches, Quezon City, 1118",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-fairview2"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Fisher Mall QC",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Lower Ground Floor, Fisher Mall, Quezon Avenue, Quezon City, 1104",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-fisher-mall-qc"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Royale Place Commonwealth",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Conti\u0027s Take Out Nook - Royale Place Commonwealth, Quezon City, 1121",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-royale-place-commonwealth"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop and Restaurant - Congressional",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Lot 6 Blk 2 Congressional Ave (Near Northridge Plaza), Quezon City, District 1",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-congressional"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Novaliches",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "G/F SM Novaliches, Quirino Highway, Quezon City, 1116",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-novaliches"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Fairview",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Annex 1 Lower Ground Floor SM Fairview Quirino Highway, corner Regalado Highway, Quezon City, 1102",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-fairview"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM City Sta. Mesa",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Upper Ground Floor, SM City Sta. Mesa, Quezon City, 1113",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-city-sta-mesa"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Trinoma",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Trinoma 2nd Floor near food choices, EDSA cor. North Avenue Bagong Pag-asa, Quezon City, 1105",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-trinoma"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop and Restaurant - Opus Mall",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "4TH Floor, Tenant 405, Quezon City, 1690",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-opus-mall"
+    },
+    {
+        "name":  "Conti\u0027s Bakery \u0026 Café - Ayala Fairview Terraces",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Upper Ground Floor Central Garden, Ayala Fairview Terraces Quirino Highway, Maligaya St., Quezon City, 1118",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakery-and-caf-ayala-fairview-terraces"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Katipunan",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "255 Katipunan Ave, Project 4, Quezon City, 1800",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-katipunan"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Robinsons Place Magnolia",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "Robinson\u0027s Magnolia, 717 Aurora Blvd, New Manila, Quezon City, Quezon City, 1112",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-robinsons-magnolia"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM North Edsa",
+        "city":  "Quezon City",
+        "region":  "Metro Manila",
+        "address":  "The Block, SM North EDSA, Epifanio de los Santos Avenue, Quezon City, 1106",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-sm-north-edsa"
+    },
+    {
+        "name":  "Contis Bakeshop \u0026 Restaurant - Venice Grand Canal",
+        "city":  "Taguig",
+        "region":  "Metro Manila",
+        "address":  "Upper McKinley Road, Taguig, 1634",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-alabang-town-center"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Serendra",
+        "city":  "Taguig",
+        "region":  "Metro Manila",
+        "address":  "Mckinley Parkway Serendra, Taguig, Metro Manila, Taguig, 1637",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-serendra"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Udenna Tower",
+        "city":  "Taguig",
+        "region":  "Metro Manila",
+        "address":  "Upper Ground Floor Udenna Tower Blk 16 Lot 1B Rizal Drive corner 4th Avenue, Fort Bonifacio , Taguig, 1630",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-udenna-tower"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Market Market",
+        "city":  "Taguig",
+        "region":  "Metro Manila",
+        "address":  "Ground Floor, Activity Center Market Market, McKinley Pkwy, Taguig, 1634",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-express-lane-market-market"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - ARCA South",
+        "city":  "Taguig",
+        "region":  "Metro Manila",
+        "address":  "Arca Boulevard, Corner W Union Dr, Taguig, Taguig, 1633",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-arca-south"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Uptown Parade",
+        "city":  "Taguig",
+        "region":  "Metro Manila",
+        "address":  "Uptown Parade, 36th St, Taguig, 1637",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-uptown-parade"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Valenzuela Town Center",
+        "city":  "Valenzuela",
+        "region":  "Metro Manila",
+        "address":  "339 Mc Arthur Highway, Karuhatan City, Valuenzuela, NCR, Third District, Valenzuela, 1441",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-ton-valenzuela-town-center"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Cabanatuan",
+        "city":  "Cabanatuan",
+        "region":  "Nueva Ecija",
+        "address":  "SM City Cabanatuan, Cabanatuan, 3100",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-cabanatuan"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Robinsons Place Gapan",
+        "city":  "Gapan",
+        "region":  "Nueva Ecija",
+        "address":  "Pan-Philippine Hwy, 1st Floor Robinsons Place Gapan , Gapan, 3105",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-express-lane-robinsons-place-gapan"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Clark Pampanga",
+        "city":  "Angeles",
+        "region":  "Pampanga",
+        "address":  "EXP 101 SM City Clark Manuel A. Roxas HighWay Barangay Malabanias, Angeles, 2009",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-clark-pampanga"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Pampanga",
+        "city":  "San Fernando",
+        "region":  "Pampanga",
+        "address":  "SM City Pampanga, San Fernando, 2000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-pampanga"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Telabastagan",
+        "city":  "San Fernando",
+        "region":  "Pampanga",
+        "address":  "SM City Telabastagan, San Fernando, Pampanga, San Fernando, 2000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-telabastagan"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - San Fernando Pampanga",
+        "city":  "San Fernando",
+        "region":  "Pampanga",
+        "address":  "MacArthur Hwy, San Fernando, 2000",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-san-fernando-pampanga"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Dagupan",
+        "city":  "Dagupan",
+        "region":  "Pangasinan",
+        "address":  "Judge Jose de Venecia Ext, Dagupan, 2400",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-ton-standalone-dagupan"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM City Urdaneta Central",
+        "city":  "Urdaneta City",
+        "region":  "Pangasinan",
+        "address":  "Level 2, SM City Urdaneta Central, Urdaneta City, 2428",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-city-urdaneta-central"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Lucena",
+        "city":  "Lucena",
+        "region":  "Quezon Province",
+        "address":  "(Beside PTT Station Lucena Platinum) National Highway, Brgy. Bocohan, Lucena, 4301",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-and-restaurant-lucena-quezon"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Angono",
+        "city":  "Angono",
+        "region":  "Rizal",
+        "address":  "2nd level, SM Center Angono, Manila East Road, Brgy. San Isidro, Angono, 1930",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-angono"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Robinsons Place Antipolo",
+        "city":  "Antipolo",
+        "region":  "Rizal",
+        "address":  "Ground Floor, Robinsons Place Antipolo, Dela Paz, Antipolo, 1870",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-robinsons-antipolo"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Masinag",
+        "city":  "Antipolo",
+        "region":  "Rizal",
+        "address":  "SM City Masinag, Infanta Hwy, Masinag, Antipolo, 1870 Rizal, Antipolo, 1807",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-masinag"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - Xentromall Montalban",
+        "city":  "Montalban",
+        "region":  "Rizal",
+        "address":  "E. Rodriguez Highway cor. R. Reyes St., Montalban, 1860",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-xentromall-montalban"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM City San Mateo",
+        "city":  "San Mateo",
+        "region":  "Rizal",
+        "address":  "Gen. Luna Ave, Brgy. Ampid 1, San Mateo, Rizal, San Mateo, 1850",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-take-out-nook-sm-city-san-mateo"
+    },
+    {
+        "name":  "Conti\u0027s Take Out Nook - SM Taytay",
+        "city":  "Taytay",
+        "region":  "Rizal",
+        "address":  "Conti\u0027s SM Taytay, Taytay, 1920",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-in-line-ton-sm-taytay"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant Standalone - Sierra Valley",
+        "city":  "Taytay",
+        "region":  "Rizal",
+        "address":  "Sierra Valley, Ortigas Ave, Taytay, 1900",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-standalone-sierra-valley"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - Tarlac City",
+        "city":  "Tarlac",
+        "region":  "Tarlac",
+        "address":  "Lot 16-22 Block 22, McArthur Highway Barangay San Sebastian, Tarlac City, Tarlac, 2300",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-tarlac-city"
+    },
+    {
+        "name":  "Conti\u0027s Bakeshop \u0026 Restaurant - SM Olongapo Central",
+        "city":  "Olongapo",
+        "region":  "Zambales",
+        "address":  "Ground Floor, SM City Olongapo Central, Rizal Avenue, Barangay East Topinac , Olongapo, 2200",
+        "source":  "https://www.contis.ph/tools/locations/locations/conti-s-bakeshop-restaurant-sm-olongapo-central"
+    }
+]
