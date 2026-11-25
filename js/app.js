@@ -18,14 +18,77 @@ const requestedPath = decodeURI(location.pathname.replace(/\/+$/,'') || '/');
 const path = requestedPath === '/index.html' ? '/' : requestedPath;
 const app = document.querySelector('#app');
 const productUrl = p => `/products/${p.id}`;
-function toast(msg){const el=document.createElement('div');el.className='toast show text-bg-dark border-0 mb-2';el.innerHTML=`<div class="d-flex"><div class="toast-body">${esc(msg)}</div><button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;document.querySelector('#toast-area').append(el);setTimeout(()=>el.remove(),2800)}
+function toast(message, { title, action, error = false } = {}) {
+  const area = document.getElementById('toast-area');
+  const previousFocus = document.activeElement;
+  const notice = document.createElement('div');
+  notice.className = error ? 'site-toast site-toast-error' : 'site-toast';
+  notice.innerHTML = `
+    <div class="site-toast-content">
+      ${title ? `<strong>${esc(title)}</strong>` : ''}
+      <p>${esc(message)}</p>
+      ${action?.href ? `<a class="site-toast-action" href="${esc(action.href)}">${esc(action.label)}</a>` :
+        action ? `<button class="site-toast-action" type="button">${esc(action.label)}</button>` : ''}
+    </div>
+    <button class="site-toast-close" type="button" aria-label="Dismiss notification">×</button>
+  `;
+
+  let timer;
+  function dismiss() {
+    clearTimeout(timer);
+    if (notice.contains(document.activeElement)) previousFocus?.focus();
+    notice.remove();
+  }
+
+  function resumeTimeout() {
+    clearTimeout(timer);
+    if (!error && notice.isConnected && !notice.matches(':hover, :focus-within')) {
+      timer = setTimeout(dismiss, action ? 7000 : 4500);
+    }
+  }
+
+  notice.querySelector('.site-toast-close').addEventListener('click', dismiss);
+  notice.querySelector('button.site-toast-action')?.addEventListener('click', action.run);
+  notice.addEventListener('pointerenter', () => clearTimeout(timer));
+  notice.addEventListener('pointerleave', resumeTimeout);
+  notice.addEventListener('focusin', () => clearTimeout(timer));
+  notice.addEventListener('focusout', () => queueMicrotask(resumeTimeout));
+  area.setAttribute('aria-atomic', 'false');
+  area.append(notice);
+  area.scrollTop = area.scrollHeight;
+  resumeTimeout();
+  return dismiss;
+}
 function updateCounts(){const cartCount=document.querySelector('#cart-count');if(cartCount)cartCount.textContent=STORE.get('cart',[]).reduce((s,x)=>s+x.qty,0);const wishlistCount=document.querySelector('#wishlist-count');if(wishlistCount)wishlistCount.textContent=STORE.get('wishlist',[]).length}
 function findProductById(id){return DATA.products.find(product=>product.id===id||(product.aliases||[]).includes(id))}
-function addCart(id,qty=1,priceOverride){const p=findProductById(id);if(!p)return;const cart=STORE.get('cart',[]);const line=cart.find(x=>x.id===p.id);const price=Number.isFinite(priceOverride)?priceOverride:p.price;if(line)line.qty+=qty;else cart.push({id:p.id,qty,price});STORE.set('cart',cart);updateCounts();toast(`${p.name} added to cart`)}
+function searchProducts(query) {
+  const normalize = text => text.toLowerCase().normalize('NFD')
+    .replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const phrase = normalize(query);
+  if (!phrase) return [];
+
+  const words = phrase.split(' ');
+  return DATA.products.flatMap(product => {
+    const name = normalize(product.name);
+    const text = `${name} ${normalize([product.category, product.subcategory, product.description].join(' '))}`;
+    if (!words.every(word => text.includes(word))) return [];
+    const rank = name === phrase ? 0 : name.startsWith(phrase) ? 1 :
+      words.every(word => name.includes(word)) ? 2 : 3;
+    return [{ product, rank }];
+  }).sort((a, b) => a.rank - b.rank).map(match => match.product);
+}
+function addCart(id,qty=1,priceOverride){const p=findProductById(id);if(!p)return;const cart=STORE.get('cart',[]);const line=cart.find(x=>x.id===p.id);const price=Number.isFinite(priceOverride)?priceOverride:p.price;if(line)line.qty+=qty;else cart.push({id:p.id,qty,price});STORE.set('cart',cart);updateCounts();toast(`${p.name} × ${qty}`, {
+  title: 'Added to cart',
+  action: { label: 'View cart', href: '/cart' }
+})}
 function isWishlisted(id){return STORE.get('wishlist',[]).includes(id)}
 function toggleWishlist(id){const wishlist=STORE.get('wishlist',[]);const next=wishlist.includes(id)?wishlist.filter(item=>item!==id):[...wishlist,id];STORE.set('wishlist',next);updateCounts();document.querySelectorAll('[data-wishlist]').forEach(button=>{if(button.dataset.wishlist!==id)return;const active=next.includes(id);button.setAttribute('aria-pressed',String(active));button.setAttribute('aria-label',active?'Remove from wishlist':'Add to wishlist');button.classList.toggle('is-wishlisted',active);if(button.classList.contains('product-detail-wishlist'))button.innerHTML=`${active?'♥':'♡'} <span>${active?'Saved to wishlist':'Add to wishlist'}</span>`;else button.innerHTML=`<span aria-hidden="true">${active?'♥':'♡'}</span>`});if(path==='/pages/wishlist')renderWishlist()}
 function scheduleLabel(){const schedule=STORE.get('schedule',null);return schedule?.date?new Date(`${schedule.date}T00:00:00`).toLocaleDateString('en-PH',{month:'short',day:'numeric'}):'Select schedule'}
-function openSchedule(productId){const product=findProductById(productId);if(!product)return;let dialog=document.querySelector('#schedule-dialog');if(!dialog){dialog=document.createElement('dialog');dialog.id='schedule-dialog';dialog.className='schedule-dialog';dialog.innerHTML='<form method="dialog" class="schedule-dialog-form"><button class="product-image-dialog-close" type="submit" aria-label="Close">×</button><div class="eyebrow">Plan your order</div><h2 class="page-title">Select a schedule</h2><p class="muted" id="schedule-product-name"></p><label class="form-label" for="schedule-fulfillment">Fulfillment</label><select class="form-select mb-3" id="schedule-fulfillment"><option>Pick-up</option><option>Delivery</option></select><label class="form-label" for="schedule-date">Preferred date</label><input class="form-control mb-4" type="date" id="schedule-date" required><div class="d-flex gap-2"><button class="btn btn-outline-contis" type="button" data-schedule-cancel>Cancel</button><button class="btn btn-contis" type="submit">Save schedule</button></div><p class="small muted mt-3 mb-0">This choice is saved in this browser and does not place an order.</p></form>';document.body.append(dialog);dialog.querySelector('[data-schedule-cancel]').addEventListener('click',()=>dialog.close());dialog.querySelector('form').addEventListener('submit',event=>{event.preventDefault();const date=dialog.querySelector('#schedule-date').value;if(!date)return;STORE.set('schedule',{date,fulfillment:dialog.querySelector('#schedule-fulfillment').value});dialog.close();document.querySelectorAll('.product-schedule-badge').forEach(button=>button.textContent=scheduleLabel());toast('Schedule saved for this browser')})}const schedule=STORE.get('schedule',null);dialog.querySelector('#schedule-product-name').textContent=product.name;dialog.querySelector('#schedule-date').value=schedule?.date||'';dialog.querySelector('#schedule-date').min=new Date().toISOString().slice(0,10);dialog.querySelector('#schedule-fulfillment').value=schedule?.fulfillment||'Pick-up';dialog.showModal()}
+function localDateInputValue() {
+ const now = new Date();
+ return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+}
+function openSchedule(productId){const product=findProductById(productId);if(!product)return;let dialog=document.querySelector('#schedule-dialog');if(!dialog){dialog=document.createElement('dialog');dialog.id='schedule-dialog';dialog.className='schedule-dialog';dialog.innerHTML='<form method="dialog" class="schedule-dialog-form"><button class="product-image-dialog-close" type="submit" aria-label="Close">×</button><div class="eyebrow">Plan your order</div><h2 class="page-title">Select a schedule</h2><p class="muted" id="schedule-product-name"></p><label class="form-label" for="schedule-fulfillment">Fulfillment</label><select class="form-select mb-3" id="schedule-fulfillment"><option>Pick-up</option><option>Delivery</option></select><label class="form-label" for="schedule-date">Preferred date</label><input class="form-control mb-4" type="date" id="schedule-date" required><div class="d-flex gap-2"><button class="btn btn-outline-contis" type="button" data-schedule-cancel>Cancel</button><button class="btn btn-contis" type="submit">Save schedule</button></div><p class="small muted mt-3 mb-0">This choice is saved in this browser and does not place an order.</p></form>';document.body.append(dialog);dialog.querySelector('[data-schedule-cancel]').addEventListener('click',()=>dialog.close());dialog.querySelector('form').addEventListener('submit',event=>{event.preventDefault();const date=dialog.querySelector('#schedule-date').value;if(!date)return;const fulfillment=dialog.querySelector('#schedule-fulfillment').value;STORE.set('schedule',{date,fulfillment});dialog.close();document.querySelectorAll('.product-schedule-badge').forEach(button=>button.textContent=scheduleLabel());const formattedDate=new Date(`${date}T00:00:00`).toLocaleDateString('en-PH',{dateStyle:'long'});toast(`${fulfillment} · ${formattedDate}`,{title:'Schedule saved'})})}const schedule=STORE.get('schedule',null);dialog.querySelector('#schedule-product-name').textContent=product.name;dialog.querySelector('#schedule-date').value=schedule?.date||'';dialog.querySelector('#schedule-date').min=localDateInputValue();dialog.querySelector('#schedule-fulfillment').value=schedule?.fulfillment||'Pick-up';dialog.showModal()}
 function recordView(p){let a=STORE.get('recent',[]).filter(x=>x!==p.id);a.unshift(p.id);STORE.set('recent',a.slice(0,8))}
 function slugify(value){return String(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
 function subcategoryLabel(category,subcategory){if(category!=='Food Trays')return subcategory;return ({'Large Food Order':'Packed Meals','Lunch/Dinner Set Menu':'Set Menu','Soups':'Hearty Soups'})[subcategory]||subcategory}
@@ -35,7 +98,8 @@ function layoutControls(layout){return `<div class="catalog-view-controls" role=
 function setupNavigation(){
  const nav=document.querySelector('.navbar-nav');
  if(!nav)return;
- nav.querySelector('a.nav-link[href="/a/self-faq"]')?.closest('.nav-item')?.remove();
+ const helpItem=nav.querySelector('a.nav-link[href="/a/self-faq"]')?.closest('.nav-item');
+ nav.querySelector('a.nav-link[href="/pages/take-out-nook"]')?.closest('.nav-item')?.remove();
  const headerActions=document.querySelector('.header-actions');
  const accountLink=headerActions?.querySelector('a[href="/account/login"]');
  if(headerActions&&accountLink&&!headerActions.querySelector('.header-wishlist'))accountLink.insertAdjacentHTML('afterend','<a class="header-wishlist" href="/pages/wishlist" aria-label="Wishlist"><span aria-hidden="true">♡</span><span id="wishlist-count">0</span></a>');
@@ -66,8 +130,7 @@ function setupNavigation(){
   const item=document.createElement('li');
   item.className='nav-item dropdown nav-services';
   item.innerHTML='<a class="nav-link" href="/pages/services">Services</a><button class="nav-dropdown-toggle d-lg-none" type="button" data-bs-toggle="dropdown" aria-label="Show services" aria-expanded="false"><span aria-hidden="true">⌄</span></button><ul class="dropdown-menu"><li><a class="dropdown-item" href="/pages/delivery">Delivery &amp; Pick-up</a></li><li><a class="dropdown-item" href="/pages/dine-in">Dine In</a></li><li><a class="dropdown-item" href="/pages/catering">Catering</a></li><li><a class="dropdown-item" href="/pages/celebration-venues">Celebration Venues</a></li><li><a class="dropdown-item" href="/pages/take-out-nook">Take-Out Nook</a></li></ul>';
-  const takeOut=nav.querySelector('a[href="/pages/take-out-nook"]');
-  if(takeOut)takeOut.closest('.nav-item').before(item);
+  if(helpItem)helpItem.before(item);
   else nav.append(item);
  }
  const searchLink=document.querySelector('.header-actions a[aria-label="Search"]');
@@ -89,7 +152,7 @@ function setupNavigation(){
   input.addEventListener('input',()=>{
    const query=input.value.trim().toLowerCase();
    if(!query){preview.innerHTML='';return}
-   const matches=DATA.products.filter(product=>`${product.name} ${product.category} ${product.subcategory} ${product.description}`.toLowerCase().includes(query)).slice(0,5);
+   const matches=searchProducts(query).slice(0,5);
    preview.innerHTML=matches.length?`${matches.map(product=>`<a class="search-preview-item" href="${productUrl(product)}"><span>${esc(product.name)}</span><small>${esc(product.category)} · ${esc(product.priceLabel||money(product.price))}</small></a>`).join('')}<a class="search-preview-all" href="/search/?q=${encodeURIComponent(input.value.trim())}">See all results for “${esc(input.value.trim())}”</a>`:'<p class="search-preview-empty">No matching products found.</p>';
   });
   search.querySelector('form').addEventListener('submit',event=>{
@@ -163,6 +226,16 @@ function renderHome(){
  const prefersReducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const carousel=bootstrap.Carousel.getOrCreateInstance(carouselElement,{interval:prefersReducedMotion?false:10000,pause:false,touch:true,keyboard:true});
  if(prefersReducedMotion)carousel.pause();else carousel.cycle();
+ if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(entries => {
+   for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    entry.target.classList.add('home-section-enter');
+    observer.unobserve(entry.target);
+   }
+  });
+  app.querySelectorAll(':scope > section:not(.home-carousel)').forEach(section => observer.observe(section));
+ }
 }
 function recentSection(){const ids=STORE.get('recent',[]);const items=ids.map(findProductById).filter(Boolean);return items.length?section('Recently Viewed Products','Pick up where you left off.',items):''}
 function renderWishlist(){const items=STORE.get('wishlist',[]).map(findProductById).filter(Boolean);app.classList.remove('product-page');app.innerHTML=`${crumb('Wishlist')}<div class="collection-heading"><div><div class="eyebrow">Saved for later</div><h1 class="page-title">My Wishlist</h1><p class="muted mb-0">${items.length} saved ${items.length===1?'product':'products'}</p></div>${items.length?layoutControls(catalogLayout()):''}</div>${items.length?grid(items,catalogLayout()):'<div class="empty-state"><h2 class="page-title">Your wishlist is empty</h2><p>Save products with the heart button to find them here.</p><a class="btn btn-contis" href="/collections/all">Browse the menu</a></div>'}`}
@@ -247,7 +320,20 @@ function renderProduct(id){
  const galleryButtons=gallery.length>1?`<div class="product-gallery-thumbnails" aria-label="Product images">${gallery.map((image,index)=>`<button type="button" class="product-gallery-thumbnail ${index===0?'active':''}" data-gallery-image="${index}" aria-label="Show product image ${index+1}" aria-pressed="${index===0}"><img src="${esc(image)}" alt="" loading="lazy"></button>`).join('')}</div><button class="gallery-arrow gallery-previous" type="button" data-gallery-step="-1" aria-label="Previous image">‹</button><button class="gallery-arrow gallery-next" type="button" data-gallery-step="1" aria-label="Next image">›</button>`:'';
  const zoomMarkup=gallery.length?`<span class="product-zoom-lens" aria-hidden="true"></span><div class="product-zoom-preview" aria-hidden="true"><img src="${esc(gallery[0])}" alt=""></div>`:'';
  const related=DATA.products.filter(item=>item.id!==p.id&&item.category===p.category).slice(0,4);
- app.innerHTML=`${crumb(p.name)}<section class="product-detail"><div class="product-gallery">${galleryButtons}<figure class="product-detail-media">${photo}${gallery.length?'<button class="product-zoom-button" type="button" data-gallery-zoom aria-label="Zoom product image">⌕</button>':''}</figure>${zoomMarkup}</div><div class="product-detail-copy"><div class="eyebrow">${esc(p.category)}${p.subcategory?` · ${esc(subcategoryLabel(p.category,p.subcategory))}`:''}</div><h1 class="page-title">${esc(p.name)}</h1><p class="product-detail-price" id="product-price">${money(selectedPrice)}</p><button class="product-detail-wishlist ${favorite?'is-wishlisted':''}" type="button" data-wishlist="${esc(p.id)}" aria-label="${favorite?'Remove from wishlist':'Add to wishlist'}" aria-pressed="${favorite}">${favorite?'♥':'♡'} <span>${favorite?'Saved to wishlist':'Add to wishlist'}</span></button><p class="product-detail-description">${esc(p.description)}</p>${variants.length>1?`<div class="product-variant"><span class="form-label d-block">Choose an option</span><div class="variant-options" role="group" aria-label="Product size">${variants.map((variant,index)=>`<button type="button" class="variant-option ${index===0?'active':''}" data-variant="${index}" aria-pressed="${index===0}">${esc(variant.title)}</button>`).join('')}</div></div>`:''}<section class="product-allergens" aria-label="Allergen information"><p>Contains the following allergens:</p>${allergens.length?`<ul>${allergens.map(allergen=>`<li>${esc(allergen)}</li>`).join('')}</ul>`:'<p class="product-allergens-unavailable">Allergen information is not listed for this product.</p>'}</section><div class="product-purchase-row">${p.price>0?`<div class="product-quantity"><button class="product-quantity-button" type="button" data-quantity-delta="-1" aria-label="Decrease quantity">−</button><input id="qty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="Quantity"><button class="product-quantity-button" type="button" data-quantity-delta="1" aria-label="Increase quantity">+</button></div><button class="btn btn-contis" id="product-add" type="button">Add to cart</button>`:`<div class="product-quantity product-quantity-disabled" aria-hidden="true">—</div><button class="btn btn-outline-secondary" type="button" disabled>Price unavailable</button>`}</div><p class="notice product-detail-notice">Price shown is from Conti's current product listing and may vary by branch or ordering channel.</p></div></section>${gallery.length?`<dialog class="product-image-dialog" id="product-image-dialog" aria-label="Product image enlarged"><button type="button" class="product-image-dialog-close" data-gallery-close aria-label="Close image">×</button><img src="${esc(gallery[0])}" alt="${esc(p.name)}"></dialog>`:''}${related.length?section('You may also like','More from this menu.',related):''}${recentSection()}`;
+ app.innerHTML=`${crumb(p.name)}<section class="product-detail"><div class="product-gallery">${galleryButtons}<figure class="product-detail-media">${photo}${gallery.length?'<button class="product-zoom-button" type="button" data-gallery-zoom aria-label="Zoom product image">⌕</button>':''}</figure>${zoomMarkup}</div><div class="product-detail-copy">
+  <div class="eyebrow">${esc(p.category)}${p.subcategory?` · ${esc(subcategoryLabel(p.category,p.subcategory))}`:''}</div>
+  <h1 class="page-title">${esc(p.name)}</h1>
+  <p class="product-detail-price" id="product-price">${money(selectedPrice)}</p>
+  ${variants.length>1?`<div class="product-variant"><span class="form-label d-block">Choose an option</span><div class="variant-options" role="group" aria-label="Product size">${variants.map((variant,index)=>`<button type="button" class="variant-option ${index===0?'active':''}" data-variant="${index}" aria-pressed="${index===0}">${esc(variant.title)}</button>`).join('')}</div></div>`:''}
+  <div class="product-purchase-row">${p.price>0?`<div class="product-quantity"><button class="product-quantity-button" type="button" data-quantity-delta="-1" aria-label="Decrease quantity">−</button><input id="qty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="Quantity"><button class="product-quantity-button" type="button" data-quantity-delta="1" aria-label="Increase quantity">+</button></div><button class="btn btn-contis" id="product-add" type="button">Add to cart</button>`:`<div class="product-quantity product-quantity-disabled" aria-hidden="true">—</div><button class="btn btn-outline-secondary" type="button" disabled>Price unavailable</button>`}</div>
+  <p class="notice product-detail-notice">Price shown is from Conti's current product listing and may vary by branch or ordering channel.</p>
+  <div class="product-detail-links">
+   <a class="product-allergen-link" href="#product-allergens">Allergen information</a>
+   <button class="product-detail-wishlist ${favorite?'is-wishlisted':''}" type="button" data-wishlist="${esc(p.id)}" aria-label="${favorite?'Remove from wishlist':'Add to wishlist'}" aria-pressed="${favorite}">${favorite?'♥':'♡'} <span>${favorite?'Saved to wishlist':'Add to wishlist'}</span></button>
+  </div>
+  <p class="product-detail-description">${esc(p.description)}</p>
+  <section class="product-allergens" id="product-allergens" tabindex="-1" aria-label="Allergen information"><p>Contains the following allergens:</p>${allergens.length?`<ul>${allergens.map(allergen=>`<li>${esc(allergen)}</li>`).join('')}</ul>`:'<p class="product-allergens-unavailable">Allergen information is not listed for this product.</p>'}</section>
+ </div></section>${gallery.length?`<dialog class="product-image-dialog" id="product-image-dialog" aria-label="Product image enlarged"><button type="button" class="product-image-dialog-close" data-gallery-close aria-label="Close image">×</button><img src="${esc(gallery[0])}" alt="${esc(p.name)}"></dialog>`:''}${related.length?section('You may also like','More from this menu.',related):''}${recentSection()}`;
  let currentImage=0;
  const setImage=index=>{
   if(!gallery.length)return;
@@ -331,57 +417,389 @@ function renderCheckout(){const cart=STORE.get('cart',[]);const rows=cart.map(x=
  const firstName=esc(profileName.shift()||'');
  const lastName=esc(profileName.join(' ')||'');
  const email=esc(profile?.email||'');
- app.innerHTML=`${crumb('Checkout')}<div class="checkout-heading"><div><div class="eyebrow">Secure checkout</div><h1 class="page-title">Complete your order</h1></div><ol class="checkout-progress" aria-label="Checkout progress"><li class="active"><span>1</span>Details</li><li><span>2</span>Review</li></ol></div><div class="checkout-layout"><div class="checkout-form-column"><form id="checkout-form" class="checkout-form"><section class="checkout-section"><div class="checkout-section-heading"><span class="checkout-section-number">01</span><div><h2>Contact details</h2><p>Where should we send your demo order?</p></div></div><div class="checkout-fields"><div class="checkout-field"><label for="checkout-first">First name</label><input id="checkout-first" class="form-control" name="first" autocomplete="given-name" value="${firstName}" placeholder="Name" required></div><div class="checkout-field"><label for="checkout-last">Last name</label><input id="checkout-last" class="form-control" name="last" autocomplete="family-name" value="${lastName}" placeholder="Surname" required></div><div class="checkout-field checkout-field-full"><label for="checkout-email">Email address</label><input id="checkout-email" class="form-control" name="email" type="email" autocomplete="email" value="${email}" placeholder="you@example.com" required></div></div></section><section class="checkout-section"><div class="checkout-section-heading"><span class="checkout-section-number">02</span><div><h2>Fulfillment</h2><p>Choose how you would receive this order.</p></div></div><fieldset class="fulfillment-options"><legend class="visually-hidden">Fulfillment method</legend><label class="fulfillment-option active"><input type="radio" name="fulfillment" value="Pick-up" checked><span class="fulfillment-icon" aria-hidden="true">▣</span><span><strong>Pick-up</strong><small>Collect from a Conti's branch</small></span></label><label class="fulfillment-option"><input type="radio" name="fulfillment" value="Delivery"><span class="fulfillment-icon" aria-hidden="true">◇</span><span><strong>Delivery</strong><small>Have your order brought to you</small></span></label></fieldset><div class="checkout-fields checkout-date-row"><div class="checkout-field"><label for="checkout-date">Preferred date</label><input id="checkout-date" class="form-control" name="date" type="date" required></div><div class="checkout-field checkout-field-note"><span>Planning ahead</span><p>Availability and branch hours may vary.</p></div></div></section><section class="checkout-section"><div class="checkout-section-heading"><span class="checkout-section-number">03</span><div><h2>Payment</h2><p>Select a payment option.</p></div></div><div class="checkout-fields"><div class="checkout-field checkout-field-full"><label for="checkout-payment">Payment method</label><select id="checkout-payment" class="form-select" name="payment"><option>GCash</option><option>Visa / Mastercard</option><option>Maya</option><option>Cash on Delivery</option><option>Bank transfer</option></select></div></div></section><div class="checkout-demo-note"><span aria-hidden="true">i</span><p><strong>Local demonstration</strong><br>Your details stay in this browser. No real order or payment is submitted.</p></div></form></div><aside class="checkout-summary" aria-label="Order summary"><div class="checkout-summary-heading"><div><div class="eyebrow">Your order</div><h2>Order summary</h2></div><a href="/cart">Edit</a></div><div class="checkout-items">${rows.map(x=>`<article class="checkout-item"><div class="checkout-item-image">${x.p.image?`<img src="${esc(x.p.image)}" alt="${esc(x.p.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none">${esc(x.p.name.charAt(0))}</span>`:`<span>${esc(x.p.name.charAt(0))}</span>`}</div><div class="checkout-item-copy"><h3>${esc(x.p.name)}</h3><p>Qty ${x.qty}</p></div><strong>${money(x.price*x.qty)}</strong></article>`).join('')}</div><div class="checkout-totals"><div><span>Subtotal</span><strong>${money(total)}</strong></div><div><span>Delivery / pick-up</span><strong>Calculated later</strong></div><div class="checkout-total"><span>Total</span><strong>${money(total)}</strong></div></div><button class="btn checkout-place-order" type="submit" form="checkout-form">Place order <span aria-hidden="true">→</span></button><p class="checkout-summary-safe">No card details are collected</p></aside></div>`;
- document.querySelector('#checkout-form').addEventListener('submit',e=>{e.preventDefault();const f=new FormData(e.currentTarget);const order={id:STORE.id('CONTIS'),created:new Date().toISOString(),customer:{first:f.get('first'),last:f.get('last'),email:f.get('email')},fulfillment:f.get('fulfillment'),date:f.get('date'),payment:f.get('payment'),paymentStatus:'paid',items:rows.map(x=>({id:x.id,name:x.p.name,qty:x.qty,price:x.price})),total,status:'Order Placed',demo:true};let orders=STORE.get('orders',[]);orders.unshift(order);STORE.set('orders',orders);STORE.set('cart',[]);updateCounts();sessionStorage.setItem('contis-checkout-success',order.id);location.href='/pages/order-confirmation/?ref='+encodeURIComponent(order.id);});
- const dateInput=document.querySelector('#checkout-date');
- if(dateInput){
-  dateInput.min=new Date().toISOString().slice(0,10);
-  const schedule=STORE.get('schedule',null);
-  if(schedule?.date)dateInput.value=schedule.date;
+ const branchOptions = [...DATA.branches]
+  .sort((a, b) => a.city.localeCompare(b.city) || a.name.localeCompare(b.name))
+  .map(branch => {
+   const label = `${branch.city} — ${branch.name}`;
+   return `<option value="${esc(label)}">${esc(label)}</option>`;
+  }).join('');
+ app.innerHTML=`${crumb('Checkout')}<div class="checkout-heading"><div><div class="eyebrow">Secure checkout</div><h1 class="page-title" id="checkout-heading" tabindex="-1">Complete your order</h1></div><ol class="checkout-progress" aria-label="Checkout progress"><li class="active" aria-current="step"><span>1</span>Details</li><li><span>2</span>Review</li></ol></div><div class="checkout-layout"><div class="checkout-form-column"><form id="checkout-form" class="checkout-form"><section class="checkout-section"><div class="checkout-section-heading"><span class="checkout-section-number">01</span><div><h2>Contact details</h2><p>Where should we send your demo order?</p></div></div><div class="checkout-fields"><div class="checkout-field"><label for="checkout-first">First name</label><input id="checkout-first" class="form-control" name="first" autocomplete="given-name" value="${firstName}" placeholder="Name" required></div><div class="checkout-field"><label for="checkout-last">Last name</label><input id="checkout-last" class="form-control" name="last" autocomplete="family-name" value="${lastName}" placeholder="Surname" required></div><div class="checkout-field checkout-field-full"><label for="checkout-email">Email address</label><input id="checkout-email" class="form-control" name="email" type="email" autocomplete="email" value="${email}" placeholder="you@example.com" required></div></div></section><section class="checkout-section"><div class="checkout-section-heading"><span class="checkout-section-number">02</span><div><h2>Fulfillment</h2><p>Choose how you would receive this order.</p></div></div><fieldset class="fulfillment-options"><legend class="visually-hidden">Fulfillment method</legend><label class="fulfillment-option active"><input type="radio" name="fulfillment" value="Pick-up" checked><span class="fulfillment-icon" aria-hidden="true">▣</span><span><strong>Pick-up</strong><small>Collect from a Conti's branch</small></span></label><label class="fulfillment-option"><input type="radio" name="fulfillment" value="Delivery"><span class="fulfillment-icon" aria-hidden="true">◇</span><span><strong>Delivery</strong><small>Have your order brought to you</small></span></label></fieldset><div class="checkout-field mb-3" id="checkout-pickup-field"><label for="checkout-pickup-branch">Pickup branch</label><select id="checkout-pickup-branch" class="form-select" name="pickupBranch" required><option value="">Choose a branch</option>${branchOptions}</select></div><div class="checkout-fields checkout-date-row"><div class="checkout-field"><label for="checkout-date">Preferred date</label><input id="checkout-date" class="form-control" name="date" type="date" required></div><div class="checkout-field checkout-field-note"><span>Planning ahead</span><p>Availability and branch hours may vary.</p></div></div></section><section class="checkout-section"><div class="checkout-section-heading"><span class="checkout-section-number">03</span><div><h2>Payment</h2><p>Select a payment option.</p></div></div><div class="checkout-fields"><div class="checkout-field checkout-field-full"><label for="checkout-payment">Payment method</label><select id="checkout-payment" class="form-select" name="payment"><option>Cash on Delivery</option><option>Visa/Mastercard</option><option>Bank Transfer (BPI)</option><option>Gcash</option><option>Maya</option><option>GrabPay</option><option>ShopeePay</option></select></div></div></section><section class="checkout-section"><div class="checkout-field"><label for="checkout-note">Order note (optional)</label><textarea id="checkout-note" class="form-control checkout-note" name="note" rows="3" maxlength="500" placeholder="Add a note for this order"></textarea></div></section><div class="checkout-demo-note"><span aria-hidden="true">i</span><p><strong>Local demonstration</strong><br>Your details stay in this browser. No real order or payment is submitted.</p></div></form><section class="checkout-section" id="checkout-review" aria-labelledby="checkout-review-heading" hidden></section></div><aside class="checkout-summary" aria-label="Order summary"><div class="checkout-summary-heading"><div><div class="eyebrow">Your order</div><h2>Order summary</h2></div><a href="/cart">Edit</a></div><div class="checkout-items">${rows.map(x=>`<article class="checkout-item"><div class="checkout-item-image">${x.p.image?`<img src="${esc(x.p.image)}" alt="${esc(x.p.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none">${esc(x.p.name.charAt(0))}</span>`:`<span>${esc(x.p.name.charAt(0))}</span>`}</div><div class="checkout-item-copy"><h3>${esc(x.p.name)}</h3><p>Qty ${x.qty}</p></div><strong>${money(x.price*x.qty)}</strong></article>`).join('')}</div><div class="checkout-totals"><div><span>Subtotal</span><strong>${money(total)}</strong></div><div><span>Delivery / pick-up</span><strong>Calculated later</strong></div><div class="checkout-total"><span>Total</span><strong>${money(total)}</strong></div></div><button class="btn checkout-place-order" type="submit" form="checkout-form"><span class="checkout-submit-label">Review order</span><span aria-hidden="true">→</span></button><p class="checkout-summary-safe">No card details are collected</p></aside></div>`;
+ const form = document.getElementById('checkout-form');
+ const review = document.getElementById('checkout-review');
+ const submit = app.querySelector('.checkout-place-order');
+ const submitLabel = submit.querySelector('.checkout-submit-label');
+ const steps = app.querySelectorAll('.checkout-progress li');
+ const options = form.querySelectorAll('.fulfillment-option');
+ const pickupField = document.getElementById('checkout-pickup-field');
+ const pickupBranch = form.elements.pickupBranch;
+ const dateInput = form.elements.date;
+ const schedule = STORE.get('schedule', null);
+ dateInput.min = localDateInputValue();
+ if (schedule?.date >= dateInput.min) dateInput.value = schedule.date;
+ if (schedule?.fulfillment === 'Delivery') form.elements.fulfillment.value = 'Delivery';
+
+ function updateFulfillment() {
+  const pickup = form.elements.fulfillment.value === 'Pick-up';
+  pickupField.hidden = !pickup;
+  pickupBranch.disabled = !pickup;
+  pickupBranch.required = pickup;
+  options.forEach(option => option.classList.toggle('active', option.querySelector('input').checked));
  }
- document.querySelectorAll('.fulfillment-option').forEach(option=>{
-  option.addEventListener('change',()=>{
-   document.querySelectorAll('.fulfillment-option').forEach(item=>item.classList.toggle('active',item.querySelector('input').checked));
+ options.forEach(option => option.addEventListener('change', updateFulfillment));
+ updateFulfillment();
+
+ let details;
+ function showStep(reviewing) {
+  form.hidden = reviewing;
+  review.hidden = !reviewing;
+  steps.forEach((step, index) => {
+   const active = index === Number(reviewing);
+   step.classList.toggle('active', active);
+   if (active) step.setAttribute('aria-current', 'step');
+   else step.removeAttribute('aria-current');
   });
+  submitLabel.textContent = reviewing ? 'Place demo order' : 'Review order';
+  if (reviewing) submit.removeAttribute('form');
+  else submit.setAttribute('form', form.id);
+  document.getElementById(reviewing ? 'checkout-review-heading' : 'checkout-heading').focus();
+ }
+
+ form.addEventListener('submit', event => {
+  event.preventDefault();
+  if (form.hidden) return;
+  const fields = new FormData(form);
+  details = {
+   customer: { first: fields.get('first'), last: fields.get('last'), email: fields.get('email') },
+   fulfillment: fields.get('fulfillment'),
+   pickupBranch: fields.get('pickupBranch'),
+   date: fields.get('date'),
+   payment: fields.get('payment'),
+   note: fields.get('note').trim()
+  };
+  const date = new Date(`${details.date}T00:00:00`).toLocaleDateString('en-PH', { dateStyle: 'long' });
+  review.innerHTML = `
+   <h2 id="checkout-review-heading" tabindex="-1">Review your order</h2>
+   <dl class="checkout-review-details">
+    <dt>Contact</dt><dd>${esc(details.customer.first)} ${esc(details.customer.last)}<br>${esc(details.customer.email)}</dd>
+    <dt>Fulfillment</dt><dd>${esc(details.fulfillment)} · ${esc(date)}</dd>
+    ${details.pickupBranch ? `<dt>Pickup branch</dt><dd>${esc(details.pickupBranch)}</dd>` : ''}
+    <dt>Payment method</dt><dd>${esc(details.payment)}</dd>
+    ${details.note ? `<dt>Order note</dt><dd class="checkout-review-note">${esc(details.note)}</dd>` : ''}
+   </dl>
+   <p class="muted">This demo saves the order in this browser and does not process a payment.</p>
+   <button type="button" class="btn btn-outline-contis">Edit details</button>
+  `;
+  review.querySelector('button').addEventListener('click', () => {
+   details = undefined;
+   showStep(false);
+  });
+  showStep(true);
+ });
+
+ submit.addEventListener('click', () => {
+  if (!form.hidden || !details || submit.disabled) return;
+  if (JSON.stringify(STORE.get('cart', [])) !== JSON.stringify(cart)) {
+   renderCheckout();
+   document.querySelector('#checkout-heading, #app .empty-state h1')?.scrollIntoView();
+   toast('Check the updated items before placing your demo order.', { title: 'Cart updated' });
+   return;
+  }
+  submit.disabled = true;
+  const order = {
+   ...details,
+   id: STORE.id('CONTIS'),
+   created: new Date().toISOString(),
+   paymentStatus: 'paid',
+   items: rows.map(x => ({ id: x.id, name: x.p.name, qty: x.qty, price: x.price })),
+   total,
+   status: 'Order Placed',
+   demo: true
+  };
+  STORE.set('orders', [order, ...STORE.get('orders', [])]);
+  STORE.set('cart', []);
+  updateCounts();
+  sessionStorage.setItem('contis-checkout-success', order.id);
+  location.href = '/pages/order-confirmation/?ref=' + encodeURIComponent(order.id);
  });
 }
-function renderConfirmation(){const ref=new URLSearchParams(location.search).get('ref');const o=STORE.get('orders',[]).find(x=>x.id===ref);if(!o){renderTracking();return}app.innerHTML=`${crumb('Order confirmation')}<div class="demo-banner">SIMULATED ORDER — This is not an order placed with Conti's.</div><div class="content-panel"><div class="eyebrow">Order reference</div><h1 class="page-title">${esc(o.id)}</h1><p>Payment successful! Your demo order has been placed.</p><p>Order status: <strong>${esc(o.status)}</strong></p><p>Total: <strong>${money(o.total)}</strong></p><a class="btn btn-contis me-2" href="/pages/order-receipt/?ref=${encodeURIComponent(o.id)}">View downloadable receipt</a><a class="btn btn-outline-contis" href="/pages/order-tracking/?ref=${encodeURIComponent(o.id)}">Track order</a></div>`;if(sessionStorage.getItem('contis-checkout-success')===o.id){sessionStorage.removeItem('contis-checkout-success');toast('Payment successful! Your demo order is confirmed.')}}
+function renderConfirmation() {
+ const ref = new URLSearchParams(location.search).get('ref');
+ const order = STORE.get('orders', []).find(item => item.id === ref);
+ if (!order) {
+  renderTracking();
+  return;
+ }
+
+ const date = order.date ? new Date(`${order.date}T00:00:00`) : null;
+ const preferredDate = date && !Number.isNaN(date.getTime()) ?
+  date.toLocaleDateString('en-PH', { dateStyle: 'long' }) : '';
+ const orderRef = encodeURIComponent(order.id);
+ app.innerHTML = `
+  ${crumb('Order confirmation')}
+  <div class="demo-banner">SIMULATED ORDER — This is not an order placed with Conti's.</div>
+  <section class="content-panel">
+   <div class="eyebrow">Order reference</div>
+   <div class="order-confirmation-actions">
+    <h1 class="page-title mb-0" id="confirmation-reference">${esc(order.id)}</h1>
+    <button class="btn btn-outline-contis" id="copy-order-reference" type="button">Copy order reference</button>
+   </div>
+   <p class="mt-3">Payment successful! Your demo order has been placed.</p>
+   <dl class="order-confirmation-details">
+    <dt>Order status</dt><dd>${esc(order.status)}</dd>
+    <dt>Total</dt><dd>${money(order.total)}</dd>
+    ${order.fulfillment ? `<dt>Fulfillment</dt><dd>${esc(order.fulfillment)}</dd>` : ''}
+    ${order.pickupBranch ? `<dt>Pickup branch</dt><dd>${esc(order.pickupBranch)}</dd>` : ''}
+    ${preferredDate ? `<dt>Preferred date</dt><dd>${esc(preferredDate)}</dd>` : ''}
+    ${order.note ? `<dt>Order note</dt><dd class="order-confirmation-note">${esc(order.note)}</dd>` : ''}
+   </dl>
+   <div class="order-confirmation-actions">
+    <a class="btn btn-contis" href="/pages/order-receipt/?ref=${orderRef}">View downloadable receipt</a>
+    <a class="btn btn-outline-contis" href="/pages/order-tracking/?ref=${orderRef}">Track order</a>
+   </div>
+  </section>
+ `;
+
+ document.getElementById('copy-order-reference').addEventListener('click', async () => {
+  try {
+   await navigator.clipboard.writeText(order.id);
+   toast('Order reference copied.');
+  } catch {
+   const selection = window.getSelection();
+   const range = document.createRange();
+   range.selectNodeContents(document.getElementById('confirmation-reference'));
+   selection.removeAllRanges();
+   selection.addRange(range);
+   toast('The order reference is selected. Use your browser or keyboard to copy it.');
+  }
+ });
+
+ if (sessionStorage.getItem('contis-checkout-success') === order.id) {
+  sessionStorage.removeItem('contis-checkout-success');
+  toast('Payment successful! Your demo order is confirmed.');
+ }
+}
 function renderTracking(){const ref=new URLSearchParams(location.search).get('ref')||'';const orders=STORE.get('orders',[]);const o=orders.find(x=>x.id.toLowerCase()===ref.toLowerCase());app.innerHTML=`${crumb('Order tracking')}<div class="demo-banner">ORDER TRACKING SIMULATOR — Progress is local demonstration data only.</div><h1 class="page-title">Track your order</h1><form id="track-form" class="row g-2 mb-4"><div class="col-md-8"><input class="form-control" name="ref" value="${esc(ref)}" placeholder="Enter your demo order reference" required></div><div class="col-md-4"><button class="btn btn-contis w-100">Find order</button></div></form>${o?trackingDetails(o):'<p class="muted">Enter an order reference generated by the demo checkout.</p>'}<h2 class="h4 mt-5">Recent demo orders</h2>${orders.length?`<ul>${orders.slice(0,5).map(x=>`<li><a href="/pages/order-tracking/?ref=${encodeURIComponent(x.id)}">${esc(x.id)}</a> — ${esc(x.status)}</li>`).join('')}</ul>`:'<p class="muted">No local demo orders yet.</p>'}`;
  document.querySelector('#track-form').onsubmit=e=>{e.preventDefault();location.href='/pages/order-tracking/?ref='+encodeURIComponent(new FormData(e.currentTarget).get('ref'))}
 }
 function trackingDetails(o){const steps=['Order Placed','Order Confirmed','Preparing',o.fulfillment.startsWith('Pick')?'Ready for Pickup':'Out for Delivery','Completed'];const idx=steps.indexOf(o.status);return `<div class="content-panel"><h2 class="h4">${esc(o.id)}</h2><p>${esc(o.fulfillment)} · ${esc(o.paymentStatus)} · ${money(o.total)}</p><div class="timeline">${steps.map((s,i)=>`<div class="timeline-step ${i<=(idx<0?0:idx)?'done':''}"><strong>${s}</strong>${i===0?'<div class="small muted">Demo order created</div>':''}</div>`).join('')}</div><label class="form-label">Demonstration status control</label><select class="form-select" id="status-control" data-order="${o.id}">${[...steps,'Cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select><p class="small muted mt-2">Changing this control updates only the local demo record.</p><a class="btn btn-outline-contis mt-2" href="/pages/order-receipt/?ref=${encodeURIComponent(o.id)}">Open receipt</a></div>`}
-async function downloadReceipt(o){
- const logoResponse=await fetch('/assets/images/brand/contis-logo.png');
- if(!logoResponse.ok)throw new Error(`Unable to load receipt logo: ${logoResponse.status}`);
- const logoBlob=await logoResponse.blob();
- const logoData=await new Promise((resolve,reject)=>{
-  const reader=new FileReader();
-  reader.onload=()=>resolve(reader.result);
-  reader.onerror=()=>reject(reader.error||new Error('Unable to read receipt logo.'));
-  reader.readAsDataURL(logoBlob);
+function receiptDetails(order) {
+ const customer = order.customer || {};
+ const placed = new Date(order.created);
+ const preferred = order.date ? new Date(`${order.date}T00:00:00`) : null;
+ return [
+  ['Order reference', order.id],
+  ['Order placed', Number.isNaN(placed.getTime()) ? '' : placed.toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' })],
+  ['Customer', [customer.first, customer.last].filter(Boolean).join(' ')],
+  ['Email', customer.email],
+  ['Fulfillment', order.fulfillment],
+  ['Preferred date', preferred && !Number.isNaN(preferred.getTime()) ? preferred.toLocaleDateString('en-PH', { dateStyle: 'long' }) : ''],
+  ['Pickup branch', order.pickupBranch],
+  ['Payment method', [order.payment, order.paymentStatus].filter(Boolean).join(' · ')]
+ ].filter(([, value]) => value);
+}
+
+function wrapReceiptText(context, value, width) {
+ const lines = [];
+ for (const paragraph of String(value).split(/\r?\n/)) {
+  let line = '';
+  for (const word of paragraph.split(/\s+/).filter(Boolean)) {
+   const next = line ? `${line} ${word}` : word;
+   if (context.measureText(next).width <= width) {
+    line = next;
+    continue;
+   }
+   if (line) lines.push(line);
+   line = '';
+   for (const char of word) {
+    if (line && context.measureText(line + char).width > width) {
+     lines.push(line);
+     line = '';
+    }
+    line += char;
+   }
+  }
+  lines.push(line);
+ }
+ return lines;
+}
+
+async function downloadReceipt(order) {
+ const logo = new Image();
+ logo.src = '/assets/images/brand/contis-logo.png';
+ await logo.decode();
+
+ const canvas = document.createElement('canvas');
+ const context = canvas.getContext('2d');
+ if (!context) throw new Error('Image export is unavailable.');
+ const width = 960;
+ const left = 64;
+ const right = width - left;
+ const contentWidth = right - left;
+ const green = '#234a31';
+ const ink = '#252820';
+ const muted = '#555f55';
+ const paper = '#f7f5ef';
+ const line = '#e0e3db';
+
+ context.font = '21px Arial';
+ const half = contentWidth / 2;
+ const details = receiptDetails(order).map(([label, value]) => [label, wrapReceiptText(context, value, half - 26)]);
+ const detailRows = [];
+ for (let index = 0; index < details.length; index += 2) {
+  detailRows.push(details.slice(index, index + 2));
+ }
+ const detailHeight = row => 46 + Math.max(...row.map(([, lines]) => lines.length)) * 27;
+ const items = order.items.map(item => ({ ...item, nameLines: wrapReceiptText(context, item.name, 370) }));
+ const itemHeight = item => 24 + item.nameLines.length * 28;
+ const note = order.note ? wrapReceiptText(context, order.note, contentWidth - 40) : [];
+ const height = Math.max(1160, 598 + detailRows.reduce((sum, row) => sum + detailHeight(row), 0)
+  + items.reduce((sum, item) => sum + itemHeight(item), 0) + (note.length ? 80 + note.length * 28 : 0));
+ canvas.width = width;
+ canvas.height = height;
+
+ function fill(color, x, y, w, h) {
+  context.fillStyle = color;
+  context.fillRect(x, y, w, h);
+ }
+
+ function text(value, x, y, { font = '21px Arial', color = ink, align = 'left' } = {}) {
+  context.font = font;
+  context.fillStyle = color;
+  context.textAlign = align;
+  context.textBaseline = 'top';
+  context.fillText(value, x, y);
+ }
+
+ fill('#fff', 0, 0, width, height);
+ fill(green, 0, 0, width, 12);
+ fill('#b89a62', 0, 12, width, 4);
+ const logoScale = Math.min(172 / logo.naturalWidth, 84 / logo.naturalHeight);
+ const logoWidth = logo.naturalWidth * logoScale;
+ context.drawImage(logo, (width - logoWidth) / 2, 46, logoWidth, logo.naturalHeight * logoScale);
+ text('Order Receipt', width / 2, 151, { font: '48px Georgia', color: green, align: 'center' });
+ text("Conti’s Bakeshop & Restaurant", width / 2, 211, { color: muted, align: 'center' });
+ fill(paper, left, 256, contentWidth, 48);
+ text('DEMO RECEIPT  ·  NOT A TAX INVOICE', width / 2, 270, { font: 'bold 18px Arial', color: green, align: 'center' });
+
+ let y = 337;
+ for (const row of detailRows) {
+  row.forEach(([label, lines], index) => {
+   const x = left + index * half;
+   text(label.toUpperCase(), x, y, { font: 'bold 16px Arial', color: muted });
+   lines.forEach((value, lineIndex) => text(value, x, y + 25 + lineIndex * 27));
+  });
+  y += detailHeight(row);
+ }
+
+ fill(green, left, y, contentWidth, 48);
+ const columns = [left + 16, left + 445, right - 176, right - 16];
+ ['Item', 'Qty', 'Unit price', 'Amount'].forEach((label, index) => {
+  text(label, columns[index], y + 14, { font: 'bold 18px Arial', color: '#fff', align: ['left', 'center', 'right', 'right'][index] });
  });
- const receiptRows=o.items.map(item=>`<tr><td>${esc(item.name)}</td><td>${item.qty}</td><td>${esc(money(item.price))}</td><td>${esc(money(item.price*item.qty))}</td></tr>`).join('');
- const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Conti's Demo Receipt - ${esc(o.id)}</title><style>*{box-sizing:border-box}body{margin:0;background:#f4f2ec;font-family:Arial,sans-serif;color:#252820}.receipt{max-width:680px;margin:40px auto;background:#fff;border:1px solid #dedbd1;padding:44px}.brand{text-align:center;border-bottom:1px solid #dedbd1;padding-bottom:24px}.brand img{display:block;width:112px;height:auto;max-height:86px;object-fit:contain;margin:0 auto 12px}.brand h1{font-family:Georgia,serif;font-size:32px;margin:8px 0 4px}.brand p{color:#70756e;font-size:12px;margin:0}.demo{margin:24px 0;padding:12px 14px;border-left:3px solid #b89a62;background:#fff7e7;color:#675432;font-size:12px}.details{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin:24px 0;font-size:13px}.details p{margin:0}.details strong{display:block;color:#70756e;font-size:11px;text-transform:uppercase;margin-bottom:3px}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}th{background:#356b45;color:#fff;text-align:left;padding:10px}td{border-bottom:1px solid #e7e5dd;padding:12px 10px}th:last-child,td:last-child{text-align:right}.total{text-align:right;font-size:20px;color:#356b45;margin:24px 0}.thanks{text-align:center;color:#70756e;font-size:12px;border-top:1px solid #e7e5dd;padding-top:20px;margin-top:30px}.thanks strong{display:block;font:italic 17px Georgia,serif;color:#3b4e3e;margin-bottom:6px}.thanks small{display:block;margin-top:8px;font-size:10px}@media(max-width:600px){.receipt{margin:0;border:0;padding:24px}.details{grid-template-columns:1fr}}</style></head><body><article class="receipt"><header class="brand"><img src="${logoData}" alt="Conti's Bakeshop &amp; Restaurant"><h1>Order Receipt</h1><p>Demo document - not a tax invoice</p></header><div class="demo">DEMO RECEIPT — This document records a locally simulated order and is not proof of a real transaction.</div><section class="details"><p><strong>Order reference</strong>${esc(o.id)}</p><p><strong>Date</strong>${esc(new Date(o.created).toLocaleString())}</p><p><strong>Customer</strong>${esc(o.customer.first)} ${esc(o.customer.last)}</p><p><strong>Email</strong>${esc(o.customer.email||'Not provided')}</p><p><strong>Fulfillment</strong>${esc(o.fulfillment)}</p><p><strong>Payment</strong>${esc(o.payment)} (${esc(o.paymentStatus)})</p></section><table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead><tbody>${receiptRows}</tbody></table><div class="total"><strong>Total: ${esc(money(o.total))}</strong></div><footer class="thanks"><strong>Thank you for choosing Conti's.</strong>Conti's Bakeshop &amp; Restaurant · 8580-8888 · wecare@contis.ph<small>Locally generated academic demonstration receipt. Not proof of a real transaction.</small></footer></article></body></html>`;
- const blob=new Blob([html],{type:'text/html;charset=utf-8'});
- const url=URL.createObjectURL(blob);
- const link=document.createElement('a');
- link.href=url;
- link.download=`${String(o.id).replace(/[^a-z0-9_-]/gi,'-')}-receipt.html`;
+ y += 48;
+ for (const item of items) {
+  item.nameLines.forEach((name, index) => text(name, columns[0], y + 12 + index * 28));
+  text(String(item.qty), columns[1], y + 12, { align: 'center' });
+  text(money(item.price), columns[2], y + 12, { align: 'right' });
+  text(money(item.price * item.qty), columns[3], y + 12, { align: 'right' });
+  y += itemHeight(item);
+  fill(line, left, y - 1, contentWidth, 1);
+ }
+
+ y += 22;
+ fill(paper, left, y, contentWidth, 58);
+ text('Order total', left + 16, y + 16, { font: 'bold 23px Arial', color: green });
+ text(money(order.total), right - 16, y + 13, { font: 'bold 30px Arial', color: green, align: 'right' });
+ y += 58;
+ if (note.length) {
+  y += 26;
+  fill(paper, left, y, contentWidth, 48 + note.length * 28);
+  text('ORDER NOTE', left + 20, y + 16, { font: 'bold 16px Arial', color: muted });
+  note.forEach((value, index) => text(value, left + 20, y + 38 + index * 28));
+ }
+
+ const footer = height - 104;
+ fill(line, left, footer, contentWidth, 1);
+ text("Thank you for choosing Conti’s.", width / 2, footer + 18, { color: green, align: 'center' });
+ text('Academic demonstration · No real transaction was processed.', width / 2, footer + 51, { font: '17px Arial', color: muted, align: 'center' });
+
+ const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+ if (!blob) throw new Error('Unable to generate the receipt image.');
+ const url = URL.createObjectURL(blob);
+ const link = document.createElement('a');
+ link.href = url;
+ link.download = `${String(order.id).replace(/[^a-z0-9_-]/gi, '-')}-receipt.png`;
  document.body.append(link);
  link.click();
  link.remove();
- setTimeout(()=>URL.revokeObjectURL(url),1000);
- toast('Receipt download started');
+ setTimeout(() => URL.revokeObjectURL(url), 1000);
+ toast(`Your demo receipt for ${order.id} is downloading.`, { title: 'Download started' });
 }
-function renderReceipt(){
- const ref=new URLSearchParams(location.search).get('ref');
- const o=STORE.get('orders',[]).find(x=>x.id===ref);
- if(!o){app.innerHTML=`${crumb('Receipt')}<div class="empty-state">Receipt not found in local demo orders.</div>`;return}
- const itemCount=o.items.reduce((sum,item)=>sum+item.qty,0);
- app.innerHTML=`${crumb('Download receipt')}<div class="receipt-page-heading"><div><h1 class="page-title mb-0">Order Receipt</h1></div></div><div class="demo-banner">DEMO RECEIPT — Not a tax invoice or proof of a real transaction.</div><section class="receipt-preview-layout"><div class="receipt-original-preview" aria-label="Receipt preview"><article class="receipt content-panel" id="receipt"><header class="receipt-document-header"><img class="receipt-document-logo" src="/assets/images/brand/contis-logo.png" alt="Conti's Bakeshop &amp; Restaurant"><h2 class="h4">Order Receipt</h2><p class="small muted">Conti's Bakeshop &amp; Restaurant</p></header><hr><p><strong>Order reference:</strong> ${esc(o.id)}<br><strong>Date:</strong> ${esc(new Date(o.created).toLocaleString())}<br><strong>Customer:</strong> ${esc(o.customer.first)} ${esc(o.customer.last)}<br><strong>Email:</strong> ${esc(o.customer.email||'Not provided')}<br><strong>Fulfillment:</strong> ${esc(o.fulfillment)}<br><strong>Payment:</strong> ${esc(o.payment)} (${esc(o.paymentStatus)})</p><table class="table"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead><tbody>${o.items.map(item=>`<tr><td>${esc(item.name)}</td><td>${item.qty}</td><td>${money(item.price)}</td><td>${money(item.price*item.qty)}</td></tr>`).join('')}</tbody></table><div class="text-end fs-5"><strong>Total: ${money(o.total)}</strong></div><footer class="receipt-document-footer"><p>Thank you for choosing Conti's.</p><span>Conti's Bakeshop &amp; Restaurant · 8580-8888 · wecare@contis.ph</span><small>Locally generated academic demonstration receipt. Not proof of a real transaction.</small></footer></article></div><aside class="receipt-download-panel"><div class="eyebrow">Receipt summary</div><h2>${esc(o.id)}</h2><dl><div><dt>Items</dt><dd>${itemCount}</dd></div><div><dt>Fulfillment</dt><dd>${esc(o.fulfillment)}</dd></div><div><dt>Payment</dt><dd>${esc(o.payment)}</dd></div><div><dt>Payment result</dt><dd>${esc(o.paymentStatus)}</dd></div></dl><div class="receipt-download-total"><span>Total</span><strong>${esc(money(o.total))}</strong></div><button class="btn receipt-preview-button" id="download-receipt" type="button">Download receipt <span aria-hidden="true">↓</span></button><p>The preview shows the downloadable receipt.</p></aside></section>`;
- document.querySelector('#download-receipt')?.addEventListener('click',()=>downloadReceipt(o).catch(error=>{console.error(error);toast('Unable to download receipt. Please try again.')}));
+
+function renderReceipt() {
+ const ref = new URLSearchParams(location.search).get('ref');
+ const order = STORE.get('orders', []).find(item => item.id === ref);
+ if (!order) {
+  app.innerHTML = `${crumb('Receipt')}<div class="empty-state">Receipt not found in local demo orders.</div>`;
+  return;
+ }
+
+ app.innerHTML = `
+  ${crumb('Order receipt')}
+  <div class="receipt-page-heading">
+   <h1 class="page-title">Order receipt</h1>
+   <button class="btn receipt-preview-button receipt-image-download" id="download-receipt" type="button">
+    Download PNG <span aria-hidden="true">↓</span>
+   </button>
+  </div>
+  <article class="receipt-document" aria-labelledby="receipt-title">
+   <header class="receipt-document-header">
+    <img class="receipt-document-logo" src="/assets/images/brand/contis-logo.png" alt="">
+    <h2 id="receipt-title">Order Receipt</h2>
+    <p>Conti’s Bakeshop &amp; Restaurant</p>
+   </header>
+   <p class="receipt-document-demo">Demo receipt · Not a tax invoice</p>
+   <dl class="receipt-document-details">
+    ${receiptDetails(order).map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}
+   </dl>
+   <table class="receipt-document-table">
+    <thead><tr><th scope="col">Item</th><th scope="col">Qty</th><th scope="col">Unit price</th><th scope="col">Amount</th></tr></thead>
+    <tbody>${order.items.map(item => `<tr><th scope="row">${esc(item.name)}</th><td>${item.qty}</td><td>${money(item.price)}</td><td>${money(item.price * item.qty)}</td></tr>`).join('')}</tbody>
+   </table>
+   <div class="receipt-document-total"><span>Order total</span><strong>${money(order.total)}</strong></div>
+   ${order.note ? `<div class="receipt-document-note"><h3>Order note</h3><p>${esc(order.note)}</p></div>` : ''}
+   <footer class="receipt-document-footer">
+    <p>Thank you for choosing Conti’s.</p>
+    <small>Academic demonstration · No real transaction was processed.</small>
+   </footer>
+  </article>
+ `;
+ const downloadButton = document.getElementById('download-receipt');
+ let dismissError;
+ let downloading = false;
+ async function startDownload() {
+  if (downloading) return;
+  downloading = true;
+  dismissError?.();
+  dismissError = undefined;
+  downloadButton.setAttribute('aria-disabled', 'true');
+  try {
+   await downloadReceipt(order);
+  } catch (error) {
+   console.error(error);
+   dismissError = toast('Try downloading your demo receipt again.', {
+    title: 'Receipt download failed',
+    error: true,
+    action: { label: 'Try again', run: startDownload }
+   });
+  } finally {
+   downloading = false;
+   downloadButton.removeAttribute('aria-disabled');
+  }
+ }
+ downloadButton.addEventListener('click', startDownload);
 }
-function renderSearch(){const q=(new URLSearchParams(location.search).get('q')||'').trim();const query=q.toLowerCase();const items=DATA.products.filter(product=>`${product.name} ${product.category} ${product.subcategory} ${product.description}`.toLowerCase().includes(query));app.innerHTML=`${crumb('Search')}<h1 class="page-title">Search</h1><form class="d-flex gap-2 mb-4" id="search-form"><label class="visually-hidden" for="search-page-input">Search products</label><input class="form-control" id="search-page-input" name="q" value="${esc(q)}" placeholder="Search products"><button class="btn btn-contis" type="submit">Search</button></form>${q?`<p class="muted">${items.length} matching products for “${esc(q)}”</p>${items.length?grid(items):'<div class="empty-state">No products match your search. Try another product or category.</div>'}`:'<p class="muted">Search the local product catalog by name, category or description.</p>'}`;document.querySelector('#search-form').onsubmit=e=>{e.preventDefault();const query=new FormData(e.currentTarget).get('q').toString().trim();if(query)location.href='/search/?q='+encodeURIComponent(query)}}
+function renderSearch(){const q=(new URLSearchParams(location.search).get('q')||'').trim();const items=searchProducts(q);app.innerHTML=`${crumb('Search')}<h1 class="page-title">Search</h1><form class="d-flex gap-2 mb-4" id="search-form"><label class="visually-hidden" for="search-page-input">Search products</label><input class="form-control" id="search-page-input" name="q" value="${esc(q)}" placeholder="Search products"><button class="btn btn-contis" type="submit">Search</button></form>${q?`<p class="muted">${items.length} matching products for “${esc(q)}”</p>${items.length?grid(items):'<div class="empty-state"><p>No products match your search. Try a product name or category.</p><a class="btn btn-outline-contis" href="/collections/all">Explore the catalog</a></div>'}`:'<p class="muted">Search the local product catalog by name, category or description.</p>'}`;document.querySelector('#search-form').onsubmit=e=>{e.preventDefault();const query=new FormData(e.currentTarget).get('q').toString().trim();if(query)location.href='/search/?q='+encodeURIComponent(query)}}
 function renderStory(){app.innerHTML=`${crumb('Our Story')}<section class="story-layout"><div class="story-copy"><div class="eyebrow">Our Story</div><h1 class="page-title">Forever sharing joy from our home to yours.</h1><p>A passion to create and serve delectable food reminiscent of the convenience and comforting warmth of one's own home, this is what we at Conti's are all about.</p><p>Since opening its doors to families and friends in Parañaque in 1997, Conti's Bakeshop and Restaurant has created and shared memories of togetherness to people who have come to love its wide selection of products, including signature dishes such as Baked Salmon, Chicken Pie, and the well-loved Mango Bravo.</p><p>With the joy and satisfaction of every guest who walks into its stores in mind, this food haven which began as a simple family restaurant now brings the familiar feelings of home and carefully prepared products to thousands of homes across the country through continuous product innovation and service expansion. Today, Conti's Bakeshop &amp; Restaurant serves guests in communities across the Philippines.</p><p>Conti's is committed to making every guest experience memorable and to continuing to share its story in every product it creates and serves.</p><a class="btn btn-contis mt-2" href="/collections/all">Discover the menu</a></div><figure class="story-photo"><img src="https://www.contis.ph/cdn/shop/files/Conti-sisters.jpg?v=1693811410&amp;width=1400" alt="The Conti sisters, whose family restaurant began in Parañaque in 1997" loading="lazy"><figcaption>The Conti sisters — the family story behind Conti's.</figcaption></figure></section><p class="small muted mt-3">Story and photograph are linked from Conti's official Our Story page. This local recreation is not an official Conti's website.</p>`}
 function renderServices(){const services=[['Online ordering','Browse cakes, baked goodies, restaurant favorites and party trays in the local catalog. This demo does not place real orders.','/collections/all','Explore the menu'],['Delivery & pick-up','Delivery and self pick-up options depend on the serving branch, date and order details. Confirm current availability with Conti’s.','/pages/delivery','Delivery information'],['Dine in','Visit a Bakeshop & Restaurant branch for dine-in service. Product and menu availability may vary by location.','/pages/dine-in','Find a restaurant'],['Take-Out Nook','Shop bakery favorites, frozen entrees and other take-home items at participating locations.','/pages/take-out-nook','Browse Take-Out Nook'],['Catering','Ask the customer care team about catering options for your gathering.','/pages/catering','Catering inquiries'],['Celebration venues','Selected locations may have function rooms. Contact the team to confirm venue availability and packages.','/pages/celebration-venues','Venue information'],['Drive-thru & park-thru','Some listed locations offer drive-thru or park-thru service. Check with the branch before visiting.','/tools/locations/directory','Check participating stores'],['Gift certificates & cake accessories','Ask a store about current gift certificate denominations, toppers and greeting cards. Availability may vary.','/collections/cake-accessories','Browse accessories'],['Third-party delivery','Delivery-platform menus and coverage can differ from Conti’s direct ordering. Check the delivery app for current options.','https://www.contis.ph/a/self-faq','Ordering help']];app.innerHTML=`${crumb('Services')}<div class="eyebrow">How we serve</div><h1 class="page-title">Services for every gathering</h1><p class="muted mb-4">From a quick pick-up to a celebration shared around the table, explore ways to enjoy Conti’s. Details and availability can vary by location.</p><div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">${services.map(([title,description,href,label])=>`<div class="col"><article class="service-card h-100"><div class="eyebrow">Conti's services</div><h2>${esc(title)}</h2><p>${esc(description)}</p><a href="${href}" ${href.startsWith('http')?'target="_blank" rel="noopener"':''}>${esc(label)} <span aria-hidden="true">→</span></a></article></div>`).join('')}</div><div class="content-panel mt-5"><h2 class="page-title">Need help planning?</h2><p class="muted">For current store, delivery or catering information, contact customer care or browse the store directory.</p><a class="btn btn-contis me-2" href="tel:85808888">Call 8580-8888</a><a class="btn btn-outline-contis" href="/tools/locations/directory">Find a store</a></div>`}
 function renderBranches(){
@@ -389,11 +807,11 @@ function renderBranches(){
  const count=coverage.reduce((sum,[,info])=>sum+Number(info.count||0),0);
  const branches=DATA.branches||[];
  const makeCoverageCards=entries=>entries.map(([region,info])=>`<article class="col-md-6 col-xl-4"><div class="coverage-card h-100"><div class="d-flex justify-content-between align-items-start gap-2"><h2>${esc(region)}</h2><span class="coverage-count">${info.count} ${info.count===1?'store':'stores'}</span></div><div class="coverage-cities">${Object.entries(info.cities).map(([city,number])=>`<span>${esc(city)} <b>${number}</b></span>`).join('')}</div><a href="https://www.contis.ph/tools/locations/regions/${region.toLowerCase().replace(/\s+/g,'-')}" target="_blank" rel="noopener">Open official ${esc(region)} directory <span aria-hidden="true">→</span></a></div></article>`).join('');
- app.innerHTML=`${crumb('Our Stores')}<div class="eyebrow">Find us across the Philippines</div><h1 class="page-title">Our Stores</h1><p class="muted">Browse all ${branches.length} branches listed in Conti’s official directory across ${coverage.length} regions. Search by branch name, city, region or address.</p><div class="row g-3 align-items-center mt-3"><div class="col-md-6"><label class="visually-hidden" for="branch-search">Search branches by name, city, region or address</label><input class="form-control" id="branch-search" type="search" placeholder="Search branches, cities or addresses"></div><div class="col-md-6 text-md-end"><a class="btn btn-contis" href="https://www.contis.ph/tools/locations/directory" target="_blank" rel="noopener">Open official store locator</a></div></div><section aria-labelledby="all-branches-heading"><div class="d-flex justify-content-between align-items-baseline gap-3 flex-wrap mt-5 mb-3"><h2 id="all-branches-heading" class="h3 mb-0">All branches</h2><span id="branch-result-count" class="small muted">${branches.length} branches</span></div><div id="branch-list" class="row g-3">${branchCards(branches)}</div></section><section aria-labelledby="regional-coverage-heading"><h2 id="regional-coverage-heading" class="h3 mt-5 mb-3">Browse by region</h2><div id="coverage-list" class="row g-3">${makeCoverageCards(coverage)}</div></section><p class="notice mt-4">Branch names and addresses are from Conti’s official location directory. Store details and hours may change; confirm with Conti’s before visiting. The directory summary reports ${count} branches.</p>`;
+ app.innerHTML=`${crumb('Our Stores')}<div class="eyebrow">Find us across the Philippines</div><h1 class="page-title">Our Stores</h1><p class="muted">Browse all ${branches.length} branches listed in Conti’s official directory across ${coverage.length} regions. Search by branch name, city, region or address.</p><div class="row g-3 align-items-center mt-3"><div class="col-md-6"><label class="visually-hidden" for="branch-search">Search branches by name, city, region or address</label><input class="form-control" id="branch-search" type="search" placeholder="Search branches, cities or addresses"></div><div class="col-md-6 text-md-end"><a class="btn btn-contis" href="https://www.contis.ph/tools/locations/directory" target="_blank" rel="noopener">Open official store locator</a></div></div><section aria-labelledby="all-branches-heading"><div class="d-flex justify-content-between align-items-baseline gap-3 flex-wrap mt-5 mb-3"><h2 id="all-branches-heading" class="h3 mb-0">All branches</h2><span id="branch-result-count" role="status" class="small muted">${branches.length} branches</span></div><div id="branch-list" class="row g-3">${branchCards(branches)}</div></section><section aria-labelledby="regional-coverage-heading"><h2 id="regional-coverage-heading" class="h3 mt-5 mb-3">Browse by region</h2><div id="coverage-list" class="row g-3">${makeCoverageCards(coverage)}</div></section><p class="notice mt-4">Branch names and addresses are from Conti’s official location directory. Store details and hours may change; confirm with Conti’s before visiting. The directory summary reports ${count} branches.</p>`;
  document.querySelector('#branch-search').oninput=event=>{
   const query=event.target.value.trim().toLowerCase();
-  const filtered=coverage.filter(([region,info])=>`${region} ${Object.keys(info.cities).join(' ')}`.toLowerCase().includes(query));
-  document.querySelector('#coverage-list').innerHTML=makeCoverageCards(filtered)||'<p class="muted">No regions or cities match that search.</p>';
+  document.querySelector('#coverage-list').closest('section').hidden=Boolean(query);
+  document.querySelector('#all-branches-heading').textContent=query?'Matching branches':'All branches';
   const filteredBranches=branches.filter(branch=>`${branch.name} ${branch.city} ${branch.region} ${branch.address}`.toLowerCase().includes(query));
   document.querySelector('#branch-list').innerHTML=branchCards(filteredBranches);
   document.querySelector('#branch-result-count').textContent=`${filteredBranches.length} ${filteredBranches.length===1?'branch':'branches'}`;
@@ -479,5 +897,18 @@ function render(){updateCounts();if(path==='/')return renderHome();if(path==='/c
 function render(){updateCounts();app.classList.remove('product-page');if(path==='/')return renderHome();if(path==='/cart')return renderCart();if(path==='/checkout')return renderCheckout();if(path==='/search')return renderSearch();if(path==='/pages/wishlist')return renderWishlist();if(path.startsWith('/collections/'))return renderCollection(path.split('/').pop());if(path.startsWith('/products/'))return renderProduct(path.split('/').pop());if(path==='/pages/our-story')return renderStory();if(path==='/pages/services')return renderServices();if(path==='/tools/locations'||path==='/tools/locations/directory'||path==='/tools/locations/countries/philippines')return renderBranches();if(path==='/a/self-faq')return renderFaq();if(path==='/account/login'||path==='/account/register'||path==='/account')return renderAccount();if(path==='/pages/order-history')return renderHistory();if(path==='/pages/order-tracking')return renderTracking();if(path==='/pages/order-receipt')return renderReceipt();if(path==='/pages/order-confirmation')return renderConfirmation();if(path==='/pages/restaurant-menu')return renderCollection('restaurant-menu');if(path==='/pages/take-out-nook')return renderCollection('take-out-nook');if(path==='/pages/large-food-orders')return renderCollection('large-food-order');if(path==='/pages/contact')return renderInfo('Contact',`<p>Customer care: <a href="mailto:wecare@contis.ph">wecare@contis.ph</a></p><p>Hotline: <a href="tel:85808888">8580-8888</a></p><p><a href="/a/self-faq">Visit Help Center</a></p>`);if(path==='/pages/delivery')return renderInfo('Delivery',`<p>Conti’s delivery arrangements depend on branch coverage and order details. The supplied reference notes website ordering, branch orders and third-party delivery platforms.</p><p>For current availability, use the <a href="/tools/locations">store locator</a> or contact <a href="mailto:wecare@contis.ph">wecare@contis.ph</a>.</p>`);if(path==='/pages/dine-in')return renderInfo('Dine In',`<p>Visit a Conti’s Bakeshop & Restaurant branch for dine-in service. Menu availability may vary by branch.</p><a href="/tools/locations/directory">Browse store directory</a>`);if(path==='/pages/catering')return renderInfo('Catering',`<p>For catering inquiries, contact Conti’s at <a href="tel:85808888">8580-8888</a> or <a href="mailto:wecare@contis.ph">wecare@contis.ph</a>.</p>`);if(path==='/pages/celebration-venues')return renderInfo('Celebration Venues',`<p>Selected branches offer function rooms. Availability, packages and reservations are handled by the operations team. Contact the hotline for current details.</p><a href="/tools/locations/directory">Find a branch</a>`);if(path==='/tools/locations/regions/laguna')return renderInfo('Laguna Stores',`<p>The supplied directory reference lists 7 Laguna branches across Biñan, Calamba, San Pablo, San Pedro and Santa Rosa. Individual address records require confirmation through the official locator.</p><a href="/tools/locations/directory">View directory coverage</a>`);if(path==='/tools/locations/locations/san-pablo-mainstreet')return renderInfo('Conti’s San Pablo – Mainstreet',`<p>Address reference: Mainstreet, San Pablo City, Laguna, Philippines.</p><p>Confirm current operating hours and exact directions with the official store locator.</p><a href="https://www.contis.ph/tools/locations/locations/san-pablo-mainstreet" target="_blank" rel="noopener">Official branch listing</a>`);if(path==='/policies/privacy-policy')return renderInfo('Privacy Policy',`<p>Refer to the <a href="https://www.contis.ph/policies/privacy-policy" target="_blank" rel="noopener">official Conti's Privacy Policy</a> for the current legal text. Full text has not yet been captured for local reproduction.</p>`);if(path==='/policies/terms-of-service')return renderInfo('Terms and Conditions',`<p>Refer to the <a href="https://www.contis.ph/policies/terms-of-service" target="_blank" rel="noopener">official Conti's Terms and Conditions</a> for the current legal text. Full text has not yet been captured for local reproduction.</p>`);render404()}
 document.addEventListener('click',e=>{const a=e.target.closest('[data-add]');if(a){const input=a.closest('.product-card-actions')?.querySelector('.quick-quantity input');addCart(a.dataset.add,Math.max(1,Number.parseInt(input?.value||a.dataset.addQuantity||'1',10)||1))}const favorite=e.target.closest('[data-wishlist]');if(favorite)toggleWishlist(favorite.dataset.wishlist);const schedule=e.target.closest('[data-open-schedule]');if(schedule)openSchedule(schedule.dataset.openSchedule);const cardQty=e.target.closest('[data-card-qty-delta]');if(cardQty){const input=cardQty.closest('.quick-quantity').querySelector('input');input.value=Math.max(1,(Number.parseInt(input.value,10)||1)+Number(cardQty.dataset.cardQtyDelta))}const layout=e.target.closest('[data-layout]');if(layout){STORE.set('catalog-layout',layout.dataset.layout);document.querySelectorAll('[data-layout]').forEach(button=>{const active=button.dataset.layout===layout.dataset.layout;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});document.querySelectorAll('.product-grid').forEach(productGrid=>{productGrid.className=`product-grid ${layout.dataset.layout==='list'?'layout-list':`layout-grid layout-grid-${layout.dataset.layout.slice(5)}`}`})}const rm=e.target.closest('[data-remove]');if(rm){STORE.set('cart',STORE.get('cart',[]).filter(x=>x.id!==rm.dataset.remove));updateCounts();renderCart()}const q=e.target.closest('[data-qty]');if(q){let c=STORE.get('cart',[]);let x=c.find(y=>y.id===q.dataset.qty);if(x){x.qty=Math.max(1,x.qty+Number(q.dataset.delta));STORE.set('cart',c);renderCart();updateCounts()}}if(e.target.closest('[data-feedback]'))toast('Thank you for your feedback. (Local demo)')});
 document.addEventListener('change',e=>{if(e.target.matches('.quick-quantity input'))e.target.value=Math.max(1,Number.parseInt(e.target.value,10)||1);if(e.target.id==='status-control'){let orders=STORE.get('orders',[]);let o=orders.find(x=>x.id===e.target.dataset.order);if(o){o.status=e.target.value;STORE.set('orders',orders);renderTracking();toast('Demo tracking status updated')}}});
+function loadChatbot() {
+  const stylesheet = document.createElement('link');
+  stylesheet.rel = 'stylesheet';
+  stylesheet.href = '/css/chatbot.css';
+  stylesheet.addEventListener('load', () => {
+    const script = document.createElement('script');
+    script.src = '/js/chatbot.js';
+    document.head.appendChild(script);
+  }, { once: true });
+  document.head.appendChild(stylesheet);
+}
+
+loadChatbot();
 setupNavigation();
 Promise.all(['/data/products.json','/data/collections.json','/data/branches.json','/data/branch-coverage.json'].map(u=>fetch(u).then(r=>{if(!r.ok)throw new Error(`Unable to load ${u}: ${r.status}`);return r.json()}))).then(([p,c,b,bc])=>{const products=Array.isArray(p)?p:p?.value;if(!Array.isArray(products))throw new Error('Product catalog JSON must contain a product array.');for(const product of products){for(const key of ['collections','tags','aliases','sourceCollections','galleryImages','variants','variantPrices']){if(!Array.isArray(product[key]))product[key]=product[key]==null?[]:[product[key]]}}DATA.products=products;DATA.collections=c;DATA.branches=b;DATA.branchCoverage=bc;setupNavigation();render()}).catch(err=>{console.error(err);app.innerHTML='<div class="notice">Local data could not load. Check the project data files and open the root index.html using Live Server.</div>'});
