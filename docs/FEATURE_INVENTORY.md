@@ -14,8 +14,7 @@
 | Wishlist | Implemented local | Browser-local saved products, header count and dedicated wishlist page |
 | Order schedule | Implemented local | Pickup/delivery and preferred date stored in this browser; does not reserve a real order |
 | Recently Viewed Products | Implemented | localStorage, deduplicated, max 8 |
-| Checkout | Implemented demo | No actual order submitted |
-| Payment sandbox | Implemented demo | Success/pending/fail/cancel outcome simulation; no credentials |
+| Checkout | Implemented demo | Local order flow with a payment-success confirmation; no actual order or payment submitted |
 | Simulated account | Implemented basic | Browser-local demo profile, not secure auth |
 | Order history | Implemented local | localStorage |
 | Order Tracking Simulator | Implemented | Lookup, progress timeline, manual status progression |

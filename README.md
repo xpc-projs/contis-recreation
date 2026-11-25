@@ -1,6 +1,6 @@
 # Conti's Bakeshop & Restaurant — Static Website Recreation
 
-**Current status:** Development increment 4. A larger local catalog, direct product/collection entry points, and region coverage data have been added. This remains an academic recreation, not an official Conti's service or a complete one-to-one reproduction.
+**Current status:** Development increment 4 - Final Recreation Phase. A larger local catalog, direct product/collection entry points, and region coverage data have been added. This remains an academic recreation, not an official Conti's service or a complete one-to-one reproduction.
 
 ## Run locally
 1. Extract the project folder.
@@ -20,7 +20,7 @@ Use the root `index.html` with Live Server or another static server. Do not open
 - Hover/focus quick actions on product cards, touch-friendly controls, a reference-style horizontal list view and saved 2–6-column grids, search, category dividers and price sorting.
 - Expandable header search with live product previews; a browser-local wishlist and order schedule.
 - Local cart and Recently Viewed Products.
-- Local checkout/payment outcome simulation, order history and order tracking simulator.
+- Local checkout with a payment-success confirmation, order history and order tracking simulator.
 - Downloadable order receipt.
 - Basic demo account interface, Help Center FAQ, contact and service pages.
 - Searchable coverage for all 102 captured stores across 16 regions and their listed cities, plus source-verified local branch samples and links to the official locator.
